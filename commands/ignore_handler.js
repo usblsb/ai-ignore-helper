@@ -6,7 +6,7 @@ const fileCreator = require('./file_creator');
 async function addToIgnoreFiles(resourcePath, ignoreFiles) {
     try {
         const workspacePath = vscode.workspace.rootPath;
-        const relativePath = path.relative(workspacePath, resourcePath);
+        const relativePath = path.relative(workspacePath, resourcePath).replace(/\\/g, '/');
 
         const results = {
             added: [],
@@ -51,8 +51,16 @@ async function addToIgnoreFiles(resourcePath, ignoreFiles) {
             // Dividir en líneas
             const lines = content.split('\n');
 
-            // Verificar si el archivo ya está ignorado
-            if (lines.includes(relativePath)) {
+            // Verificar si el archivo ya está ignorado (considerando diferentes formatos de ruta)
+            const normalizedPath = relativePath;
+            const alreadyIgnored = lines.some(line => {
+                // Normalizar la línea para comparación
+                const normalizedLine = line.trim().replace(/\\/g, '/');
+                // Comparar rutas normalizadas
+                return normalizedLine === normalizedPath;
+            });
+
+            if (alreadyIgnored) {
                 results.skipped.push({
                     file: ignoreFile.name,
                     path: relativePath

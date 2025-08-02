@@ -78,7 +78,7 @@ async function addToIgnore(resourceUris) {
             }
         }
 
-        // Procesar cada recurso
+        // Procesar cada recurso individualmente y acumular resultados
         const allResults = {
             added: [],
             skipped: [],
@@ -86,12 +86,20 @@ async function addToIgnore(resourceUris) {
         };
 
         for (const resource of resources) {
-            const results = await ignoreHandler.addToIgnoreFiles(resource.fsPath, selectedFiles);
+            try {
+                const results = await ignoreHandler.addToIgnoreFiles(resource.fsPath, selectedFiles);
 
-            // Acumular resultados
-            allResults.added.push(...results.added);
-            allResults.skipped.push(...results.skipped);
-            allResults.errors.push(...results.errors);
+                // Acumular resultados
+                allResults.added.push(...results.added);
+                allResults.skipped.push(...results.skipped);
+                allResults.errors.push(...results.errors);
+            } catch (error) {
+                allResults.errors.push({
+                    file: 'General',
+                    path: resource.fsPath,
+                    reason: error.message
+                });
+            }
         }
 
         // Mostrar resumen
