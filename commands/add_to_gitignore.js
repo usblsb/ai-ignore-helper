@@ -3,9 +3,14 @@ const path = require('path');
 const fs = require('fs').promises;
 const configManager = require('./config_manager');
 
+/**
+ * Función principal para añadir archivos y carpetas a archivos ignore
+ * @param {vscode.Uri|vscode.Uri[]} resourceUris - URI(s) de los recursos a añadir
+ */
 async function addToIgnore(resourceUris) {
     try {
-        // Verificar si se recibió un array de recursos o un solo recurso
+        // Normalizar la entrada: convertir a array si es necesario
+        // Esto permite manejar tanto selecciones individuales como múltiples
         let resources = [];
         if (Array.isArray(resourceUris)) {
             resources = resourceUris;
@@ -21,13 +26,14 @@ async function addToIgnore(resourceUris) {
             return;
         }
 
-        // Cargar configuración
+        // Cargar la configuración desde el archivo ignore-files-config.json
         const config = configManager.loadConfig();
         if (!config) {
             return;
         }
 
-        // Filtrar archivos ignore habilitados
+        // Filtrar solo los archivos ignore que están habilitados en la configuración
+        // Esto permite al usuario deshabilitar ciertos tipos de archivos ignore
         const enabledIgnoreFiles = config.ignoreFiles.filter(file => file.enabled);
 
         if (enabledIgnoreFiles.length === 0) {
@@ -37,8 +43,10 @@ async function addToIgnore(resourceUris) {
 
         let selectedFiles = [];
 
-        // Mostrar menú de selección si está configurado
+        // Mostrar menú de selección si está configurado en defaultBehavior
+        // Esto permite al usuario elegir específicamente a qué archivos ignore añadir
         if (config.defaultBehavior.showSelectionMenu) {
+            // Crear elementos para el menú de selección con información descriptiva
             const items = enabledIgnoreFiles.map(file => ({
                 label: file.name,
                 description: file.path,
@@ -46,6 +54,7 @@ async function addToIgnore(resourceUris) {
                 file: file
             }));
 
+            // Configurar opciones del menú según la configuración
             const options = {
                 placeHolder: 'Select ignore files to add to',
                 canPickMany: config.defaultBehavior.allowMultipleSelection
@@ -54,16 +63,18 @@ async function addToIgnore(resourceUris) {
             const selected = await vscode.window.showQuickPick(items, options);
 
             if (!selected || selected.length === 0) {
-                return; // Usuario canceló
+                return; // Usuario canceló la operación
             }
 
+            // Extraer los objetos de archivo de la selección
             selectedFiles = selected.map(item => item.file);
         } else {
-            // Usar todos los archivos habilitados
+            // Si no se muestra menú, usar todos los archivos ignore habilitados
             selectedFiles = enabledIgnoreFiles;
         }
 
-        // Mostrar confirmación si está configurado
+        // Mostrar diálogo de confirmación si está configurado
+        // Esto da al usuario una última oportunidad de cancelar la operación
         if (config.defaultBehavior.showConfirmation) {
             const resourceNames = resources.map(r => path.basename(r.fsPath)).join(', ');
             const fileNames = selectedFiles.map(file => file.name).join(', ');
@@ -74,31 +85,32 @@ async function addToIgnore(resourceUris) {
             );
 
             if (confirm !== 'Yes') {
-                return; // Usuario canceló
+                return; // Usuario canceló la operación
             }
         }
 
-        // Procesar cada archivo ignore
+        // Inicializar objeto para recopilar todos los resultados de la operación
         const allResults = {
-            added: [],
-            skipped: [],
-            errors: []
+            added: [],     // Archivos añadidos exitosamente
+            skipped: [],   // Archivos que ya existían (duplicados)
+            errors: []     // Errores encontrados durante el procesamiento
         };
 
-        // Procesar cada archivo ignore por separado
+        // Procesar cada archivo ignore seleccionado de forma secuencial
+        // Esto asegura que todos los archivos ignore reciban las mismas entradas
         for (const ignoreFile of selectedFiles) {
             try {
                 const ignoreFilePath = path.join(vscode.workspace.rootPath, ignoreFile.path);
 
-                // Verificar si el archivo existe, si no, crearlo
+                // Verificar si el archivo ignore existe, y crearlo si es necesario
                 let fileExists = false;
                 try {
                     await fs.access(ignoreFilePath);
                     fileExists = true;
                 } catch (error) {
-                    // El archivo no existe
+                    // El archivo no existe, verificar si debe crearse automáticamente
                     if (ignoreFile.createIfNotExists) {
-                        // Crear directorios si es necesario
+                        // Crear toda la estructura de directorios necesaria
                         const dirPath = path.dirname(ignoreFilePath);
                         await fs.mkdir(dirPath, { recursive: true });
 
@@ -107,6 +119,7 @@ async function addToIgnore(resourceUris) {
                         fileExists = true;
                         vscode.window.showInformationMessage(`Created ignore file: ${ignoreFile.path}`);
                     } else {
+                        // El archivo no existe y no está configurado para crearse
                         allResults.errors.push({
                             file: ignoreFile.name,
                             path: 'Multiple files',
@@ -120,7 +133,8 @@ async function addToIgnore(resourceUris) {
                 const content = await fs.readFile(ignoreFilePath, 'utf8');
                 const originalLines = content.split(/\r?\n/);
 
-                // Crear un conjunto con las rutas existentes para una búsqueda más eficiente
+                // Crear un conjunto (Set) con las rutas existentes para búsquedas O(1)
+                // Esto mejora significativamente el rendimiento al verificar duplicados
                 const existingPaths = new Set();
                 originalLines.forEach(line => {
                     const trimmedLine = line.trim();
@@ -129,10 +143,15 @@ async function addToIgnore(resourceUris) {
                     }
                 });
 
-                // Procesar cada recurso individualmente
+                // Crear un conjunto separado para las nuevas rutas a añadir
+                // Esto evita duplicados cuando se procesan múltiples archivos en la misma operación
+                const newPathsToAdd = new Set();
+
+                // Procesar cada recurso seleccionado individualmente
+                // CORRECCIÓN: Este bucle ahora maneja correctamente múltiples archivos
                 for (const resource of resources) {
                     try {
-                        // Verificar que el recurso sea válido
+                        // Validar que el recurso tenga una ruta válida
                         if (!resource || !resource.fsPath) {
                             allResults.errors.push({
                                 file: ignoreFile.name,
@@ -142,17 +161,25 @@ async function addToIgnore(resourceUris) {
                             continue;
                         }
 
+                        // Convertir la ruta absoluta a relativa y normalizar separadores
                         const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
 
-                        // Verificar si el archivo ya está en el ignore usando el conjunto
+                        // Verificar duplicados: tanto en el archivo existente como en esta operación
                         if (existingPaths.has(relativePath)) {
+                            // El archivo ya existe en el archivo ignore
+                            allResults.skipped.push({
+                                file: ignoreFile.name,
+                                path: relativePath
+                            });
+                        } else if (newPathsToAdd.has(relativePath)) {
+                            // Ya fue añadido en esta misma operación (evita duplicados internos)
                             allResults.skipped.push({
                                 file: ignoreFile.name,
                                 path: relativePath
                             });
                         } else {
-                            // Añadir al conjunto para evitar duplicados en esta misma operación
-                            existingPaths.add(relativePath);
+                            // Añadir la nueva ruta a ambos conjuntos de seguimiento
+                            newPathsToAdd.add(relativePath);
                             allResults.added.push({
                                 file: ignoreFile.name,
                                 path: relativePath
@@ -167,36 +194,32 @@ async function addToIgnore(resourceUris) {
                     }
                 }
 
-                // Reconstruir el archivo con todas las líneas (existentes + nuevas)
+                // Reconstruir el archivo completo preservando el formato original
                 const updatedLines = [];
 
-                // Añadir líneas existentes (manteniendo el orden)
+                // Mantener todas las líneas existentes en su orden original
+                // Esto preserva comentarios, líneas vacías y el formato del usuario
                 originalLines.forEach(line => {
-                    const trimmedLine = line.trim();
-                    if (trimmedLine && existingPaths.has(trimmedLine)) {
-                        updatedLines.push(line);
-                        existingPaths.delete(trimmedLine); // Marcar como procesada
-                    } else if (!trimmedLine) {
-                        // Mantener líneas vacías
-                        updatedLines.push(line);
-                    }
+                    updatedLines.push(line);
                 });
 
-                // Añadir nuevas rutas (las que quedan en el conjunto)
-                existingPaths.forEach(path => {
-                    updatedLines.push(path);
+                // Añadir las nuevas rutas al final del archivo
+                // Solo se añaden las rutas que no existían previamente
+                newPathsToAdd.forEach(newPath => {
+                    updatedLines.push(newPath);
                 });
 
-                // Escribir el contenido actualizado al archivo ignore
+                // Escribir el contenido actualizado de vuelta al archivo ignore
                 await fs.writeFile(ignoreFilePath, updatedLines.join('\n'));
 
-                // Mostrar información sobre los archivos añadidos
+                // Mostrar notificación del progreso para este archivo ignore específico
                 const addedCount = allResults.added.filter(item => item.file === ignoreFile.name).length;
                 if (addedCount > 0) {
                     vscode.window.showInformationMessage(`Added ${addedCount} entries to ${ignoreFile.name}`);
                 }
 
             } catch (error) {
+                // Capturar cualquier error inesperado durante el procesamiento
                 allResults.errors.push({
                     file: ignoreFile.name,
                     path: 'Multiple files',
@@ -205,7 +228,7 @@ async function addToIgnore(resourceUris) {
             }
         }
 
-        // Mostrar resumen
+        // Generar y mostrar resumen final de toda la operación
         let message = '';
 
         if (allResults.added.length > 0) {

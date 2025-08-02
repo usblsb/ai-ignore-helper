@@ -3,6 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const fileCreator = require('./file_creator');
 
+/**
+ * Función auxiliar para añadir un recurso individual a múltiples archivos ignore
+ * NOTA: Esta función está siendo reemplazada por la lógica mejorada en add_to_gitignore.js
+ * @param {string} resourcePath - Ruta del recurso a añadir
+ * @param {Array} ignoreFiles - Array de configuraciones de archivos ignore
+ * @returns {Object} Resultados de la operación
+ */
 async function addToIgnoreFiles(resourcePath, ignoreFiles) {
     try {
         const workspacePath = vscode.workspace.rootPath;

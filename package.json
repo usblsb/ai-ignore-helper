@@ -1,53 +1,53 @@
 {
-  "name": "ai-ignore-helper",
-  "displayName": "AI Ignore Helper",
-  "description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-  "version": "1.1.2",
-  "engines": {
-    "vscode": "^1.60.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:ai-ignore.activate",
-    "onCommand:ai-ignore.addToIgnore"
-  ],
-  "main": "./extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "ai-ignore.activate",
-        "title": "Activate AI Ignore Helper"
-      },
-      {
-        "command": "ai-ignore.addToIgnore",
-        "title": "Add to ignore files"
-      },
-      {
-        "command": "ai-ignore.openConfig",
-        "title": "Open AI Ignore Helper Configuration"
-      }
-    ],
-    "menus": {
-      "explorer/context": [
-        {
-          "command": "ai-ignore.addToIgnore",
-          "when": "resourceFilename != ''",
-          "group": "1_modification"
-        },
-        {
-          "command": "ai-ignore.openConfig",
-          "when": "resourceFilename == ''",
-          "group": "z_commands"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "ai-ignore.openConfig",
-          "when": "true"
-        }
-      ]
-    }
-  }
+	"name": "ai-ignore-helper",
+	"displayName": "AI Ignore Helper",
+	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
+	"version": "1.1.3",
+	"engines": {
+		"vscode": "^1.60.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:ai-ignore.activate",
+		"onCommand:ai-ignore.addToIgnore"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "ai-ignore.activate",
+				"title": "Activate AI Ignore Helper"
+			},
+			{
+				"command": "ai-ignore.addToIgnore",
+				"title": "Add to ignore files"
+			},
+			{
+				"command": "ai-ignore.openConfig",
+				"title": "Open AI Ignore Helper Configuration"
+			}
+		],
+		"menus": {
+			"explorer/context": [
+				{
+					"command": "ai-ignore.addToIgnore",
+					"when": "resourceFilename != ''",
+					"group": "1_modification"
+				},
+				{
+					"command": "ai-ignore.openConfig",
+					"when": "resourceFilename == ''",
+					"group": "z_commands"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "ai-ignore.openConfig",
+					"when": "true"
+				}
+			]
+		}
+	}
 }
