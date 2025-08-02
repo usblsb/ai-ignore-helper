@@ -120,7 +120,16 @@ async function addToIgnore(resourceUris) {
                 const content = await fs.readFile(ignoreFilePath, 'utf8');
                 const originalLines = content.split(/\r?\n/);
 
-                // Procesar cada recurso individualmente con manejo de errores
+                // Crear un conjunto con las rutas existentes para una búsqueda más eficiente
+                const existingPaths = new Set();
+                originalLines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        existingPaths.add(trimmedLine);
+                    }
+                });
+
+                // Procesar cada recurso individualmente
                 for (const resource of resources) {
                     try {
                         // Verificar que el recurso sea válido
@@ -135,17 +144,15 @@ async function addToIgnore(resourceUris) {
 
                         const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
 
-                        // Verificar si el archivo ya está en el ignore (en el contenido original)
-                        const alreadyExists = originalLines.some(line => line.trim() === relativePath);
-
-                        if (alreadyExists) {
+                        // Verificar si el archivo ya está en el ignore usando el conjunto
+                        if (existingPaths.has(relativePath)) {
                             allResults.skipped.push({
                                 file: ignoreFile.name,
                                 path: relativePath
                             });
                         } else {
-                            // Añadir directamente al archivo ignore
-                            await fs.appendFile(ignoreFilePath, '\n' + relativePath);
+                            // Añadir al conjunto para evitar duplicados en esta misma operación
+                            existingPaths.add(relativePath);
                             allResults.added.push({
                                 file: ignoreFile.name,
                                 path: relativePath
@@ -159,6 +166,29 @@ async function addToIgnore(resourceUris) {
                         });
                     }
                 }
+
+                // Reconstruir el archivo con todas las líneas (existentes + nuevas)
+                const updatedLines = [];
+
+                // Añadir líneas existentes (manteniendo el orden)
+                originalLines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine && existingPaths.has(trimmedLine)) {
+                        updatedLines.push(line);
+                        existingPaths.delete(trimmedLine); // Marcar como procesada
+                    } else if (!trimmedLine) {
+                        // Mantener líneas vacías
+                        updatedLines.push(line);
+                    }
+                });
+
+                // Añadir nuevas rutas (las que quedan en el conjunto)
+                existingPaths.forEach(path => {
+                    updatedLines.push(path);
+                });
+
+                // Escribir el contenido actualizado al archivo ignore
+                await fs.writeFile(ignoreFilePath, updatedLines.join('\n'));
 
                 // Mostrar información sobre los archivos añadidos
                 const addedCount = allResults.added.filter(item => item.file === ignoreFile.name).length;
