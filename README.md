@@ -165,21 +165,54 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Solución de Problemas
 
-#### Configuración no aparece en el menú desplegable
+#### La configuración no se sincroniza automáticamente
 
-Si añades una nueva configuración de archivo ignore en VS Code Settings pero no aparece en el menú desplegable:
+**Problema**: Los cambios en VS Code Settings no se reflejan automáticamente en el menú "Add to ignore files".
 
-1. **Causa**: La extensión lee inicialmente desde el archivo JSON local (`ignore-files-config.json`)
-2. **Solución**: Ejecuta el comando `AI Ignore: Sync from JSON` para sincronizar desde VS Code Settings al archivo JSON
-3. **Alternativa**: Reinicia VS Code para que la sincronización automática tome efecto
+**Soluciones implementadas en v1.2.3**:
+- **Activación automática**: La extensión se activa al iniciar VS Code para registrar el listener de configuración
+- **Detección inteligente de scope**: Maneja correctamente User Settings y Workspace Settings
+- **Logs de depuración**: Permite identificar problemas de sincronización
 
-**Ejemplo**: Si añades "GIT Ignore" en `settings.json` pero no aparece, ejecuta la sincronización manual.
+**Si persiste el problema**:
+1. **Verifica el scope**: Asegúrate de editar en el mismo scope (User vs Workspace Settings)
+2. **Recarga la ventana**: Ejecuta "Developer: Reload Window" desde la paleta de comandos
+3. **Sincronización manual**: Ejecuta `AI Ignore: Sync from JSON` desde la paleta de comandos
+4. **Revisa los logs**: Abre la consola de desarrollador para ver los logs de sincronización
+
+#### Verificar que la sincronización funciona
+
+1. Abre la consola de desarrollador (Help > Toggle Developer Tools)
+2. Ve a la pestaña "Console"
+3. Edita la configuración de `ai-ignore` en Settings
+4. Deberías ver logs como:
+   - "Evento de cambio de configuración detectado"
+   - "Configuración AI Ignore cambió, sincronizando..."
+   - "Sincronización completada exitosamente"
 
 ### Versiones
 
-- **Versión actual**: 1.2.0
-- **Última mejora**: Sincronización mejorada entre VS Code Settings y archivo JSON
+- **Versión actual**: 2.0.4
+- **Última mejora**: Sincronización inteligente bidireccional y configuración extendida
 - **Compatibilidad**: VS Code 1.60.0 y superior
+
+#### Historial de Versiones
+
+**v2.0.4**
+- **Configuración extendida**: Añadidos 11 nuevos tipos de archivos ignore (ESLint, Prettier, Sourcegraph, Jest, Webpack, Babel, Stylelint, Markdownlint, TypeScript, Roocode, Cline) para un total de 15 archivos ignore soportados.
+- **Sincronización inteligente bidireccional**: La extensión ahora detecta automáticamente cuál fuente (VS Code Settings o archivo JSON) tiene más configuraciones y sincroniza desde la fuente más completa.
+- **Detección automática de configuración**: Al inicializar, la extensión compara el número de archivos ignore en ambas fuentes y prioriza la que tenga más elementos configurados.
+- **Compatibilidad mejorada**: Mantiene retrocompatibilidad total con configuraciones existentes mientras permite expansión automática.
+
+**v1.2.3**
+- **Activación automática**: La extensión ahora se activa automáticamente al iniciar VS Code (usando `"*"` en activationEvents) para garantizar que el listener de configuración se registre correctamente.
+- **Sincronización inteligente**: Mejorada la detección del scope de configuración (User Settings vs Workspace Settings) para una sincronización más precisa.
+- **Logs de depuración**: Añadidos logs detallados para facilitar la identificación de problemas de sincronización.
+- **Compatibilidad mejorada**: La extensión ahora maneja correctamente tanto User Settings como Workspace Settings según el contexto.
+
+**v1.2.0**
+- **Sincronización mejorada**: Se corrigió el problema donde la configuración "GIT Ignore" no aparecía en el menú desplegable. La extensión ahora sincroniza correctamente entre VS Code Settings y el archivo JSON local.
+- **Comando de sincronización**: Se añadió el comando `AI Ignore: Sync from JSON` para forzar la sincronización manual cuando sea necesario.
 
 ### Limitaciones Conocidas
 

@@ -33,18 +33,21 @@ async function updateVSCodeSettings(jsonConfig) {
   const config = vscode.workspace.getConfiguration('ai-ignore');
   
   try {
+    // Determinar el target apropiado: Global si no hay workspace, Workspace si existe
+    const target = vscode.workspace.workspaceFolders ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global;
+    
     // Actualizar archivos ignore
-    await config.update('ignoreFiles', jsonConfig.ignoreFiles, vscode.ConfigurationTarget.Workspace);
+    await config.update('ignoreFiles', jsonConfig.ignoreFiles, target);
     
     // Actualizar comportamiento por defecto
     if (jsonConfig.defaultBehavior) {
-      await config.update('showSelectionMenu', jsonConfig.defaultBehavior.showSelectionMenu, vscode.ConfigurationTarget.Workspace);
-      await config.update('allowMultipleSelection', jsonConfig.defaultBehavior.allowMultipleSelection, vscode.ConfigurationTarget.Workspace);
-      await config.update('createDirectories', jsonConfig.defaultBehavior.createDirectories, vscode.ConfigurationTarget.Workspace);
-      await config.update('showConfirmation', jsonConfig.defaultBehavior.showConfirmation, vscode.ConfigurationTarget.Workspace);
+      await config.update('showSelectionMenu', jsonConfig.defaultBehavior.showSelectionMenu, target);
+      await config.update('allowMultipleSelection', jsonConfig.defaultBehavior.allowMultipleSelection, target);
+      await config.update('createDirectories', jsonConfig.defaultBehavior.createDirectories, target);
+      await config.update('showConfirmation', jsonConfig.defaultBehavior.showConfirmation, target);
     }
     
-    console.log('VS Code Settings actualizados correctamente');
+    console.log('VS Code Settings actualizados correctamente en', target === vscode.ConfigurationTarget.Global ? 'User Settings' : 'Workspace Settings');
   } catch (error) {
     console.error('Error actualizando VS Code Settings:', error);
     vscode.window.showErrorMessage('Error actualizando configuración: ' + error.message);
@@ -109,11 +112,20 @@ async function syncToJSON(configPath) {
  * @param {string} configPath - Ruta del archivo de configuración JSON
  */
 function setupConfigurationListener(configPath) {
+  console.log('Registrando listener de configuración para:', configPath);
   return vscode.workspace.onDidChangeConfiguration(async (event) => {
+    console.log('Evento de cambio de configuración detectado');
     // Solo reaccionar a cambios en nuestra configuración
     if (event.affectsConfiguration('ai-ignore')) {
-      console.log('Configuración AI Ignore cambió, sincronizando...');
-      await updateJSONFromSettings(configPath);
+      console.log('Configuración AI Ignore cambió, sincronizando desde VS Code Settings al JSON...');
+      try {
+        await updateJSONFromSettings(configPath);
+        console.log('Sincronización completada exitosamente');
+      } catch (error) {
+        console.error('Error durante la sincronización automática:', error);
+      }
+    } else {
+      console.log('Cambio de configuración no relacionado con ai-ignore');
     }
   });
 }
@@ -124,16 +136,34 @@ function setupConfigurationListener(configPath) {
  */
 async function initializeSync(configPath) {
   try {
-    // Verificar si existe el archivo JSON
-    const jsonExists = await fs.access(configPath).then(() => true).catch(() => false);
+    // Verificar si el archivo JSON existe y tiene más configuraciones que VS Code Settings
+    let shouldSyncFromJSON = false;
     
-    if (jsonExists) {
-      // Si existe JSON, sincronizar a VS Code Settings
+    try {
+      const jsonContent = await fs.readFile(configPath, 'utf8');
+      const jsonConfig = JSON.parse(jsonContent);
+      const vsCodeConfig = getVSCodeConfig();
+      
+      // Si el JSON tiene más archivos ignore que VS Code Settings, sincronizar desde JSON
+      if (jsonConfig.ignoreFiles && jsonConfig.ignoreFiles.length > vsCodeConfig.ignoreFiles.length) {
+        shouldSyncFromJSON = true;
+        console.log(`JSON tiene ${jsonConfig.ignoreFiles.length} archivos, VS Code Settings tiene ${vsCodeConfig.ignoreFiles.length}`);
+      }
+    } catch (error) {
+      console.log('No se pudo leer el archivo JSON o VS Code Settings, usando configuración por defecto');
+    }
+    
+    if (shouldSyncFromJSON) {
+      // Sincronizar desde JSON a VS Code Settings si JSON tiene más configuraciones
+      console.log('Inicializando sincronización: JSON -> VS Code Settings');
       await syncFromJSON(configPath);
     } else {
-      // Si no existe JSON, crear desde VS Code Settings
+      // Sincronizar desde VS Code Settings al JSON (comportamiento anterior)
+      console.log('Inicializando sincronización: VS Code Settings -> JSON');
       await updateJSONFromSettings(configPath);
     }
+    
+    console.log('Sincronización inicial completada');
     
     // Configurar listener para cambios futuros
     const disposable = setupConfigurationListener(configPath);
