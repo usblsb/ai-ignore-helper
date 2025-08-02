@@ -93,7 +93,17 @@ async function addToIgnore(contextSelection, allSelections) {
         // Procesar cada archivo ignore por separado
         for (const ignoreFile of selectedFiles) {
             try {
-                const ignoreFilePath = path.join(vscode.workspace.rootPath, ignoreFile.path);
+                const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+                if (!workspaceRoot) {
+                    allResults.errors.push({
+                        file: ignoreFile.name,
+                        path: 'Multiple files',
+                        reason: 'No workspace folder found'
+                    });
+                    continue;
+                }
+                
+                const ignoreFilePath = path.join(workspaceRoot, ignoreFile.path);
 
                 // Verificar si el archivo existe, si no, crearlo
                 let fileExists = false;
@@ -147,7 +157,7 @@ async function addToIgnore(contextSelection, allSelections) {
                             continue;
                         }
 
-                        const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
+                        const relativePath = path.relative(workspaceRoot, resource.fsPath).replace(/\\/g, '/');
 
                         // Verificar si el archivo ya está en el ignore usando el conjunto
                         if (existingPaths.has(relativePath)) {

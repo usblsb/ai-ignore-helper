@@ -2,7 +2,7 @@
 	"name": "ai-ignore-helper",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-	"version": "1.1.11",
+	"version": "1.2.0",
 	"engines": {
 		"vscode": "^1.60.0"
 	},
@@ -19,6 +19,83 @@
 	],
 	"main": "./extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "AI Ignore Helper",
+			"properties": {
+				"ai-ignore.ignoreFiles": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "Nombre descriptivo del archivo ignore"
+							},
+							"path": {
+								"type": "string",
+								"description": "Ruta relativa del archivo ignore"
+							},
+							"description": {
+								"type": "string",
+								"description": "Descripción del propósito del archivo ignore"
+							},
+							"createIfNotExists": {
+								"type": "boolean",
+								"description": "Crear el archivo si no existe"
+							},
+							"enabled": {
+								"type": "boolean",
+								"description": "Habilitar este archivo ignore"
+							}
+						}
+					},
+					"default": [
+						{
+							"name": "Trae Ignore",
+							"path": ".trae/.ignore",
+							"description": "Archivo ignore para Trae AI",
+							"createIfNotExists": true,
+							"enabled": true
+						},
+						{
+							"name": "Docker Ignore",
+							"path": ".dockerignore",
+							"description": "Archivo ignore para Docker",
+							"createIfNotExists": true,
+							"enabled": true
+						},
+						{
+							"name": "NPM Ignore",
+							"path": ".npmignore",
+							"description": "Archivo ignore para NPM",
+							"createIfNotExists": true,
+							"enabled": true
+						}
+					],
+					"description": "Lista de archivos ignore configurados para la extensión"
+				},
+				"ai-ignore.showSelectionMenu": {
+					"type": "boolean",
+					"default": true,
+					"description": "Mostrar menú de selección para elegir archivos ignore"
+				},
+				"ai-ignore.allowMultipleSelection": {
+					"type": "boolean",
+					"default": true,
+					"description": "Permitir selección múltiple de archivos ignore"
+				},
+				"ai-ignore.createDirectories": {
+					"type": "boolean",
+					"default": true,
+					"description": "Crear directorios automáticamente si no existen"
+				},
+				"ai-ignore.showConfirmation": {
+					"type": "boolean",
+					"default": true,
+					"description": "Mostrar confirmación antes de añadir archivos"
+				}
+			}
+		},
 		"commands": [
 			{
 				"command": "ai-ignore.activate",
@@ -31,15 +108,23 @@
 			{
 				"command": "ai-ignore.openConfig",
 				"title": "Open AI Ignore Helper Configuration"
+			},
+			{
+				"command": "ai-ignore.syncFromJSON",
+				"title": "AI Ignore: Sync from JSON to Settings"
+			},
+			{
+				"command": "ai-ignore.syncToJSON",
+				"title": "AI Ignore: Sync from Settings to JSON"
 			}
 		],
 		"menus": {
 			"explorer/context": [
 				{
-				"command": "ai-ignore.addToIgnore",
-				"when": "resourceExtname || resourceFilename",
-				"group": "1_modification"
-			},
+					"command": "ai-ignore.addToIgnore",
+					"when": "resourceExtname || resourceFilename",
+					"group": "1_modification"
+				},
 				{
 					"command": "ai-ignore.openConfig",
 					"when": "resourceFilename == ''",

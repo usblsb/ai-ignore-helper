@@ -20,6 +20,13 @@
 	  "description": "Archivo ignore para NPM",
 	  "createIfNotExists": true,
 	  "enabled": true
+	},
+	{
+	  "name": "GIT Ignore",
+	  "path": ".gitignore",
+	  "description": "Archivo ignore para GIT",
+	  "createIfNotExists": true,
+	  "enabled": true
 	}
   ],
   "defaultBehavior": {

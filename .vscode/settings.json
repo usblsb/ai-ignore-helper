@@ -1,0 +1,29 @@
+{
+    "ai-ignore.ignoreFiles": [
+        {
+            "name": "Trae Ignore",
+            "path": ".trae/.ignore",
+            "description": "Archivo ignore para Trae AI",
+            "createIfNotExists": true,
+            "enabled": true
+        },
+        {
+            "name": "Docker Ignore",
+            "path": ".dockerignore",
+            "description": "Archivo ignore para Docker",
+            "createIfNotExists": true,
+            "enabled": true
+        },
+        {
+            "name": "NPM Ignore",
+            "path": ".npmignore",
+            "description": "Archivo ignore para NPM",
+            "createIfNotExists": true,
+            "enabled": true
+        }
+    ],
+    "ai-ignore.showSelectionMenu": true,
+    "ai-ignore.allowMultipleSelection": true,
+    "ai-ignore.createDirectories": true,
+    "ai-ignore.showConfirmation": true
+}
