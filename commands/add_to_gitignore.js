@@ -118,14 +118,15 @@ async function addToIgnore(resourceUris) {
 
                 // Leer el contenido actual del archivo ignore
                 const content = await fs.readFile(ignoreFilePath, 'utf8');
-                const lines = content.split(/\r?\n/);
+                const originalLines = content.split(/\r?\n/);
 
-                // Procesar cada recurso para este archivo ignore
+                // Recolectar las rutas que no están en el archivo original
+                const newPaths = [];
                 for (const resource of resources) {
                     const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
 
-                    // Verificar si el archivo ya está en el ignore
-                    const alreadyExists = lines.some(line => line.trim() === relativePath);
+                    // Verificar si el archivo ya está en el ignore (en el contenido original)
+                    const alreadyExists = originalLines.some(line => line.trim() === relativePath);
 
                     if (alreadyExists) {
                         allResults.skipped.push({
@@ -133,8 +134,8 @@ async function addToIgnore(resourceUris) {
                             path: relativePath
                         });
                     } else {
-                        // Añadir el archivo al ignore
-                        lines.push(relativePath);
+                        // Añadir a la lista de nuevas rutas
+                        newPaths.push(relativePath);
                         allResults.added.push({
                             file: ignoreFile.name,
                             path: relativePath
@@ -142,11 +143,14 @@ async function addToIgnore(resourceUris) {
                     }
                 }
 
+                // Combinar las líneas originales con las nuevas rutas
+                const allLines = [...originalLines, ...newPaths];
+
                 // Eliminar duplicados manteniendo el orden
                 const uniqueLines = [];
                 const seen = new Set();
 
-                for (const line of lines) {
+                for (const line of allLines) {
                     const trimmedLine = line.trim();
                     if (trimmedLine && !seen.has(trimmedLine)) {
                         seen.add(trimmedLine);
@@ -161,7 +165,7 @@ async function addToIgnore(resourceUris) {
                 await fs.writeFile(ignoreFilePath, uniqueLines.join('\n'));
 
                 // Mostrar información sobre los archivos añadidos
-                const addedCount = allResults.added.filter(item => item.file === ignoreFile.name).length;
+                const addedCount = newPaths.length;
                 if (addedCount > 0) {
                     vscode.window.showInformationMessage(`Added ${addedCount} entries to ${ignoreFile.name}`);
                 }
