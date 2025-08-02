@@ -85,15 +85,20 @@ async function addToIgnore(resourceUris) {
             errors: []
         };
 
+        // Procesar cada recurso secuencialmente con manejo de errores detallado
         for (const resource of resources) {
             try {
+                console.log(`Procesando recurso: ${resource.fsPath}`);
                 const results = await ignoreHandler.addToIgnoreFiles(resource.fsPath, selectedFiles);
 
                 // Acumular resultados
                 allResults.added.push(...results.added);
                 allResults.skipped.push(...results.skipped);
                 allResults.errors.push(...results.errors);
+
+                console.log(`Resultados para ${resource.fsPath}:`, results);
             } catch (error) {
+                console.error(`Error al procesar ${resource.fsPath}:`, error);
                 allResults.errors.push({
                     file: 'General',
                     path: resource.fsPath,
@@ -102,7 +107,7 @@ async function addToIgnore(resourceUris) {
             }
         }
 
-        // Mostrar resumen
+        // Mostrar resumen detallado
         let message = '';
 
         if (allResults.added.length > 0) {
