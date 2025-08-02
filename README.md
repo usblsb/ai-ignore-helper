@@ -192,11 +192,16 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Versiones
 
-- **Versión actual**: 2.0.4
-- **Última mejora**: Sincronización inteligente bidireccional y configuración extendida
+- **Versión actual**: 2.0.6
+- **Última mejora**: Icono visual añadido a la extensión
 - **Compatibilidad**: VS Code 1.60.0 y superior
 
 #### Historial de Versiones
+
+**v2.0.6**
+- **Icono visual**: Añadido icono oficial a la extensión para mejor identificación en el marketplace y panel de extensiones de VS Code.
+- **Mejora de UX**: La extensión ahora es más fácil de identificar visualmente entre otras extensiones instaladas.
+- **Recursos gráficos**: Incluye archivos de icono en formato PNG y SVG en la carpeta `/images`.
 
 **v2.0.4**
 - **Configuración extendida**: Añadidos 11 nuevos tipos de archivos ignore (ESLint, Prettier, Sourcegraph, Jest, Webpack, Babel, Stylelint, Markdownlint, TypeScript, Roocode, Cline) para un total de 15 archivos ignore soportados.

@@ -2,7 +2,8 @@
 	"name": "ai-ignore-helper",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-	"version": "2.0.5",
+	"version": "2.0.6",
+	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.60.0"
 	},
