@@ -79,23 +79,71 @@ async function addToIgnore(resourceUris) {
         }
 
         // Procesar cada recurso
-        const results = [];
+        const allResults = {
+            added: [],
+            skipped: [],
+            errors: []
+        };
+
         for (const resource of resources) {
-            const result = await ignoreHandler.addToIgnoreFiles(resource.fsPath, selectedFiles);
-            results.push({
-                resource: resource.fsPath,
-                success: result
-            });
+            const results = await ignoreHandler.addToIgnoreFiles(resource.fsPath, selectedFiles);
+
+            // Acumular resultados
+            allResults.added.push(...results.added);
+            allResults.skipped.push(...results.skipped);
+            allResults.errors.push(...results.errors);
         }
 
         // Mostrar resumen
-        const successCount = results.filter(r => r.success).length;
-        const failCount = results.length - successCount;
+        let message = '';
 
-        if (failCount === 0) {
-            vscode.window.showInformationMessage(`Successfully added ${successCount} resources to ignore files.`);
+        if (allResults.added.length > 0) {
+            message += `Successfully added ${allResults.added.length} entries to ignore files.\n`;
+        }
+
+        if (allResults.skipped.length > 0) {
+            message += `Skipped ${allResults.skipped.length} entries (already present).\n`;
+        }
+
+        if (allResults.errors.length > 0) {
+            message += `Encountered ${allResults.errors.length} errors.\n`;
+        }
+
+        if (message) {
+            // Mostrar mensaje con opción de ver detalles
+            vscode.window.showInformationMessage(message, 'View Details').then(selection => {
+                if (selection === 'View Details') {
+                    // Crear un documento con los detalles
+                    const details = [];
+
+                    if (allResults.added.length > 0) {
+                        details.push('Added entries:');
+                        allResults.added.forEach(item => {
+                            details.push(`  - ${item.path} to ${item.file}`);
+                        });
+                    }
+
+                    if (allResults.skipped.length > 0) {
+                        details.push('Skipped entries (already present):');
+                        allResults.skipped.forEach(item => {
+                            details.push(`  - ${item.path} in ${item.file}`);
+                        });
+                    }
+
+                    if (allResults.errors.length > 0) {
+                        details.push('Errors:');
+                        allResults.errors.forEach(item => {
+                            details.push(`  - ${item.path} in ${item.file}: ${item.reason}`);
+                        });
+                    }
+
+                    // Mostrar en un nuevo documento
+                    vscode.workspace.openTextDocument({ content: details.join('\n'), language: 'plaintext' })
+                        .then(doc => vscode.window.showTextDocument(doc));
+                }
+            });
         } else {
-            vscode.window.showWarningMessage(`Added ${successCount} resources to ignore files. Failed for ${failCount} resources.`);
+            vscode.window.showInformationMessage('No changes made.');
         }
 
     } catch (error) {
