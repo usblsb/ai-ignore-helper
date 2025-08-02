@@ -1,7 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
 const configManager = require('./config_manager');
-const ignoreHandler = require('./ignore_handler');
 
 async function addToIgnore(resourceUris) {
     try {
@@ -78,68 +77,115 @@ async function addToIgnore(resourceUris) {
             }
         }
 
-        // Procesar cada archivo ignore por separado para todos los recursos
+        // Procesar cada archivo ignore
         const allResults = {
             added: [],
             skipped: [],
             errors: []
         };
 
-        // Procesar cada archivo ignore individualmente
         for (const ignoreFile of selectedFiles) {
-            const ignoreFilePath = path.join(vscode.workspace.rootPath, ignoreFile.path);
+            try {
+                const ignoreFilePath = path.join(vscode.workspace.rootPath, ignoreFile.path);
+                const ignoreFileUri = vscode.Uri.file(ignoreFilePath);
 
-            // Verificar si el archivo existe, si no, crearlo
-            if (!vscode.workspace.fs.stat(vscode.Uri.file(ignoreFilePath))) {
-                if (ignoreFile.createIfNotExists) {
-                    // Crear directorios si es necesario
-                    const dirPath = path.dirname(ignoreFilePath);
-                    if (!vscode.workspace.fs.stat(vscode.Uri.file(dirPath))) {
-                        await vscode.workspace.fs.createDirectory(vscode.Uri.file(dirPath));
+                // Verificar si el archivo existe, si no, crearlo
+                let fileExists = false;
+                try {
+                    await vscode.workspace.fs.stat(ignoreFileUri);
+                    fileExists = true;
+                } catch (error) {
+                    // El archivo no existe
+                    if (ignoreFile.createIfNotExists) {
+                        // Crear directorios si es necesario
+                        const dirPath = path.dirname(ignoreFilePath);
+                        const dirUri = vscode.Uri.file(dirPath);
+
+                        try {
+                            await vscode.workspace.fs.stat(dirUri);
+                        } catch (dirError) {
+                            // El directorio no existe, crearlo
+                            await vscode.workspace.fs.createDirectory(dirUri);
+                        }
+
+                        // Crear el archivo ignore vacío
+                        await vscode.workspace.fs.writeFile(ignoreFileUri, new Uint8Array());
+                        fileExists = true;
+                        vscode.window.showInformationMessage(`Created ignore file: ${ignoreFile.path}`);
+                    } else {
+                        allResults.errors.push({
+                            file: ignoreFile.name,
+                            path: 'Multiple files',
+                            reason: `Ignore file does not exist and is not configured to be created: ${ignoreFile.path}`
+                        });
+                        continue;
                     }
-
-                    // Crear el archivo ignore vacío
-                    await vscode.workspace.fs.writeFile(vscode.Uri.file(ignoreFilePath), new Uint8Array());
-                    vscode.window.showInformationMessage(`Created ignore file: ${ignoreFile.path}`);
-                } else {
-                    vscode.window.showWarningMessage(`Ignore file does not exist and is not configured to be created: ${ignoreFile.path}`);
-                    continue;
                 }
-            }
 
-            // Leer el contenido actual del archivo ignore
-            const content = await vscode.workspace.fs.readFile(vscode.Uri.file(ignoreFilePath));
-            const contentStr = new TextDecoder().decode(content);
-            const lines = contentStr.split(/\r?\n/);
+                // Leer el contenido actual del archivo ignore
+                const content = await vscode.workspace.fs.readFile(ignoreFileUri);
+                const contentStr = new TextDecoder().decode(content);
+                const originalLines = contentStr.split(/\r?\n/);
 
-            // Procesar cada recurso para este archivo ignore
-            for (const resource of resources) {
-                const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
+                // Preparar un mapa para rastrear duplicados
+                const seenLines = new Map();
+                const uniqueLines = [];
 
-                // Verificar si el archivo ya está en el ignore
-                const alreadyExists = lines.some(line => line.trim() === relativePath);
-
-                if (alreadyExists) {
-                    allResults.skipped.push({
-                        file: ignoreFile.name,
-                        path: relativePath
-                    });
-                } else {
-                    // Añadir el archivo al ignore
-                    lines.push(relativePath);
-                    allResults.added.push({
-                        file: ignoreFile.name,
-                        path: relativePath
-                    });
+                // Procesar líneas existentes para mantener la primera ocurrencia
+                for (const line of originalLines) {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine && !seenLines.has(trimmedLine)) {
+                        seenLines.set(trimmedLine, true);
+                        uniqueLines.push(line);
+                    } else if (!trimmedLine) {
+                        // Mantener líneas vacías
+                        uniqueLines.push(line);
+                    }
                 }
-            }
 
-            // Escribir el contenido actualizado al archivo ignore
-            const updatedContent = lines.join('\n');
-            await vscode.workspace.fs.writeFile(
-                vscode.Uri.file(ignoreFilePath),
-                new TextEncoder().encode(updatedContent)
-            );
+                // Procesar cada recurso para este archivo ignore
+                const addedResources = [];
+
+                for (const resource of resources) {
+                    const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
+
+                    // Verificar si el archivo ya está en el ignore
+                    if (seenLines.has(relativePath)) {
+                        allResults.skipped.push({
+                            file: ignoreFile.name,
+                            path: relativePath
+                        });
+                    } else {
+                        // Añadir el archivo al ignore
+                        uniqueLines.push(relativePath);
+                        seenLines.set(relativePath, true);
+                        addedResources.push(relativePath);
+                        allResults.added.push({
+                            file: ignoreFile.name,
+                            path: relativePath
+                        });
+                    }
+                }
+
+                // Escribir el contenido actualizado al archivo ignore
+                const updatedContent = uniqueLines.join('\n');
+                await vscode.workspace.fs.writeFile(
+                    ignoreFileUri,
+                    new TextEncoder().encode(updatedContent)
+                );
+
+                // Mostrar información sobre los archivos añadidos
+                if (addedResources.length > 0) {
+                    vscode.window.showInformationMessage(`Added ${addedResources.length} entries to ${ignoreFile.name}`);
+                }
+
+            } catch (error) {
+                allResults.errors.push({
+                    file: ignoreFile.name,
+                    path: 'Multiple files',
+                    reason: `Error processing ignore file: ${error.message}`
+                });
+            }
         }
 
         // Mostrar resumen
@@ -151,6 +197,10 @@ async function addToIgnore(resourceUris) {
 
         if (allResults.skipped.length > 0) {
             message += `Skipped ${allResults.skipped.length} entries (already present).\n`;
+        }
+
+        if (allResults.errors.length > 0) {
+            message += `Encountered ${allResults.errors.length} errors.\n`;
         }
 
         if (message) {
@@ -171,6 +221,13 @@ async function addToIgnore(resourceUris) {
                         details.push('Skipped entries (already present):');
                         allResults.skipped.forEach(item => {
                             details.push(`  - ${item.path} in ${item.file}`);
+                        });
+                    }
+
+                    if (allResults.errors.length > 0) {
+                        details.push('Errors:');
+                        allResults.errors.forEach(item => {
+                            details.push(`  - ${item.file}: ${item.reason}`);
                         });
                     }
 
