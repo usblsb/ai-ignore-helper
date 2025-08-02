@@ -120,52 +120,48 @@ async function addToIgnore(resourceUris) {
                 const content = await fs.readFile(ignoreFilePath, 'utf8');
                 const originalLines = content.split(/\r?\n/);
 
-                // Recolectar las rutas que no están en el archivo original
-                const newPaths = [];
+                // Procesar cada recurso individualmente con manejo de errores
                 for (const resource of resources) {
-                    const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
+                    try {
+                        // Verificar que el recurso sea válido
+                        if (!resource || !resource.fsPath) {
+                            allResults.errors.push({
+                                file: ignoreFile.name,
+                                path: 'Invalid resource',
+                                reason: 'Resource is invalid or has no path'
+                            });
+                            continue;
+                        }
 
-                    // Verificar si el archivo ya está en el ignore (en el contenido original)
-                    const alreadyExists = originalLines.some(line => line.trim() === relativePath);
+                        const relativePath = path.relative(vscode.workspace.rootPath, resource.fsPath).replace(/\\/g, '/');
 
-                    if (alreadyExists) {
-                        allResults.skipped.push({
+                        // Verificar si el archivo ya está en el ignore (en el contenido original)
+                        const alreadyExists = originalLines.some(line => line.trim() === relativePath);
+
+                        if (alreadyExists) {
+                            allResults.skipped.push({
+                                file: ignoreFile.name,
+                                path: relativePath
+                            });
+                        } else {
+                            // Añadir directamente al archivo ignore
+                            await fs.appendFile(ignoreFilePath, '\n' + relativePath);
+                            allResults.added.push({
+                                file: ignoreFile.name,
+                                path: relativePath
+                            });
+                        }
+                    } catch (resourceError) {
+                        allResults.errors.push({
                             file: ignoreFile.name,
-                            path: relativePath
-                        });
-                    } else {
-                        // Añadir a la lista de nuevas rutas
-                        newPaths.push(relativePath);
-                        allResults.added.push({
-                            file: ignoreFile.name,
-                            path: relativePath
+                            path: resource?.fsPath || 'Unknown',
+                            reason: `Error processing resource: ${resourceError.message}`
                         });
                     }
                 }
-
-                // Combinar las líneas originales con las nuevas rutas
-                const allLines = [...originalLines, ...newPaths];
-
-                // Eliminar duplicados manteniendo el orden
-                const uniqueLines = [];
-                const seen = new Set();
-
-                for (const line of allLines) {
-                    const trimmedLine = line.trim();
-                    if (trimmedLine && !seen.has(trimmedLine)) {
-                        seen.add(trimmedLine);
-                        uniqueLines.push(line);
-                    } else if (!trimmedLine) {
-                        // Mantener líneas vacías
-                        uniqueLines.push(line);
-                    }
-                }
-
-                // Escribir el contenido actualizado al archivo ignore
-                await fs.writeFile(ignoreFilePath, uniqueLines.join('\n'));
 
                 // Mostrar información sobre los archivos añadidos
-                const addedCount = newPaths.length;
+                const addedCount = allResults.added.filter(item => item.file === ignoreFile.name).length;
                 if (addedCount > 0) {
                     vscode.window.showInformationMessage(`Added ${addedCount} entries to ${ignoreFile.name}`);
                 }
