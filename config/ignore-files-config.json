@@ -1,38 +1,38 @@
 {
   "ignoreFiles": [
-	{
-	  "name": "Trae Ignore",
-	  "path": ".trae/.ignore",
-	  "description": "Archivo ignore para Trae AI",
-	  "createIfNotExists": true,
-	  "enabled": true
-	},
-	{
-	  "name": "Docker Ignore",
-	  "path": ".dockerignore",
-	  "description": "Archivo ignore para Docker",
-	  "createIfNotExists": true,
-	  "enabled": true
-	},
-	{
-	  "name": "NPM Ignore",
-	  "path": ".npmignore",
-	  "description": "Archivo ignore para NPM",
-	  "createIfNotExists": true,
-	  "enabled": true
-	},
-	{
-	  "name": "GIT Ignore",
-	  "path": ".gitignore",
-	  "description": "Archivo ignore para GIT",
-	  "createIfNotExists": true,
-	  "enabled": true
-	}
+    {
+      "name": "Trae Ignore",
+      "path": ".trae/.ignore",
+      "description": "Archivo ignore para Trae AI",
+      "createIfNotExists": true,
+      "enabled": true
+    },
+    {
+      "name": "Docker Ignore",
+      "path": ".dockerignore",
+      "description": "Archivo ignore para Docker",
+      "createIfNotExists": true,
+      "enabled": true
+    },
+    {
+      "name": "NPM Ignore",
+      "path": ".npmignore",
+      "description": "Archivo ignore para NPM",
+      "createIfNotExists": true,
+      "enabled": true
+    },
+    {
+      "name": "GIT Ignore",
+      "path": ".gitignore",
+      "description": "Archivo ignore para GIT",
+      "createIfNotExists": true,
+      "enabled": true
+    }
   ],
   "defaultBehavior": {
-	"showSelectionMenu": true,
-	"allowMultipleSelection": true,
-	"createDirectories": true,
-	"showConfirmation": true
+    "showSelectionMenu": true,
+    "allowMultipleSelection": true,
+    "createDirectories": true,
+    "showConfirmation": true
   }
 }
