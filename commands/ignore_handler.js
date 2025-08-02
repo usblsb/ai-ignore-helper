@@ -8,6 +8,9 @@ async function addToIgnoreFiles(resourcePath, ignoreFiles) {
         const workspacePath = vscode.workspace.rootPath;
         const relativePath = path.relative(workspacePath, resourcePath);
 
+        let successCount = 0;
+        let errorMessages = [];
+
         for (const ignoreFile of ignoreFiles) {
             const ignoreFilePath = path.join(workspacePath, ignoreFile.path);
 
@@ -18,12 +21,12 @@ async function addToIgnoreFiles(resourcePath, ignoreFiles) {
                     // Crear el archivo ignore (y su directorio si es necesario)
                     const created = await fileCreator.createIgnoreFile(ignoreFile.path);
                     if (!created) {
-                        vscode.window.showWarningMessage(`No se pudo crear el archivo ignore: ${ignoreFile.path}`);
+                        errorMessages.push(`No se pudo crear el archivo ignore: ${ignoreFile.path}`);
                         continue;
                     }
                     vscode.window.showInformationMessage(`Se ha creado el archivo ignore: ${ignoreFile.path}`);
                 } else {
-                    vscode.window.showWarningMessage(`El archivo ignore no existe y no está configurado para crearse automáticamente: ${ignoreFile.path}`);
+                    errorMessages.push(`El archivo ignore no existe y no está configurado para crearse automáticamente: ${ignoreFile.path}`);
                     continue;
                 }
             }
@@ -40,6 +43,7 @@ async function addToIgnoreFiles(resourcePath, ignoreFiles) {
             // Verificar si el archivo ya está ignorado
             if (lines.includes(relativePath)) {
                 vscode.window.showInformationMessage(`${relativePath} ya está en ${ignoreFile.name}`);
+                successCount++;
                 continue;
             }
 
@@ -50,9 +54,17 @@ async function addToIgnoreFiles(resourcePath, ignoreFiles) {
             fs.writeFileSync(ignoreFilePath, lines.join('\n'));
 
             vscode.window.showInformationMessage(`Añadido ${relativePath} a ${ignoreFile.name}`);
+            successCount++;
         }
 
-        return true;
+        // Si hubo algún error, mostrar un mensaje de advertencia con los detalles
+        if (errorMessages.length > 0) {
+            const errorMsg = errorMessages.join('\n');
+            vscode.window.showWarningMessage(`Se completó con ${errorMessages.length} errores:\n${errorMsg}`);
+        }
+
+        // Devolver true si al menos una operación fue exitosa
+        return successCount > 0;
     } catch (error) {
         vscode.window.showErrorMessage(`Error al añadir a los archivos ignore: ${error.message}`);
         return false;
