@@ -104,6 +104,13 @@
 			"description": "Archivo ignore para Cline AI",
 			"createIfNotExists": true,
 			"enabled": true
+		},
+		{
+			"name": "Cursor Ignore",
+			"path": ".cursorignore",
+			"description": "Archivo Ignore para Cursor",
+			"createIfNotExists": true,
+			"enabled": true
 		}
 	],
 	"ai-ignore.showSelectionMenu": true,

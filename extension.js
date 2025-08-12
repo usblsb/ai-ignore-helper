@@ -5,6 +5,8 @@ const addToIgnoreCommand = require('./commands/add_to_gitignore');
 const openConfigCommand = require('./commands/open_config');
 const toggleAdding = require('./controllers/toggle-adding');
 const settingsSync = require('./commands/settings_sync');
+const addRule = require('./commands/add_rule');
+const removeRule = require('./commands/remove_rule');
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -26,6 +28,8 @@ async function activate(context) {
 	const activateCommandDisposable = vscode.commands.registerCommand('ai-ignore.activate', activateCommand);
 	const addToIgnoreCommandDisposable = vscode.commands.registerCommand('ai-ignore.addToIgnore', addToIgnoreCommand);
 	const openConfigCommandDisposable = vscode.commands.registerCommand('ai-ignore.openConfig', openConfigCommand);
+	const addRuleDisposable = vscode.commands.registerCommand('ai-ignore.addRule', addRule);
+	const removeRuleDisposable = vscode.commands.registerCommand('ai-ignore.removeRule', removeRule);
 
 	// Register sync commands
 	const syncFromJSONDisposable = vscode.commands.registerCommand('ai-ignore.syncFromJSON', async () => {
@@ -50,6 +54,8 @@ async function activate(context) {
 		activateCommandDisposable, 
 		addToIgnoreCommandDisposable, 
 		openConfigCommandDisposable,
+		addRuleDisposable,
+		removeRuleDisposable,
 		syncFromJSONDisposable,
 		syncToJSONDisposable
 	);

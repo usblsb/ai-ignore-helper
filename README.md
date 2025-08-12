@@ -21,12 +21,12 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ## ✨ Características Principales
 
--   **Añadir a múltiples archivos ignore:** Permite agregar una carpeta o archivo a varios archivos `.ignore` (como `.dockerignore`, `.npmignore`, `.trae/.ignore`, etc.) de una sola vez.
--   **Menú contextual:** Se integra con el menú del explorador de archivos de VS Code (clic derecho sobre un archivo o carpeta).
--   **Selección múltiple de archivos:** Soporta correctamente la selección múltiple de archivos desde el explorador, procesando todos los archivos seleccionados en una sola operación.
--   **Altamente configurable:** Los usuarios pueden definir sus propios archivos `ignore` a través de un archivo `JSON` de configuración.
--   **Creación automática:** Puede crear los archivos `ignore` y sus directorios si no existen.
--   **Selección de archivos ignore:** Permite elegir a qué archivos `ignore` específicos se quiere añadir la ruta.
+- **Añadir a múltiples archivos ignore:** Permite agregar una carpeta o archivo a varios archivos `.ignore` (como `.dockerignore`, `.npmignore`, `.trae/.ignore`, etc.) de una sola vez.
+- **Menú contextual:** Se integra con el menú del explorador de archivos de VS Code (clic derecho sobre un archivo o carpeta).
+- **Selección múltiple de archivos:** Soporta correctamente la selección múltiple de archivos desde el explorador, procesando todos los archivos seleccionados en una sola operación.
+- **Altamente configurable:** Los usuarios pueden definir sus propios archivos `ignore` a través de un archivo `JSON` de configuración.
+- **Creación automática:** Puede crear los archivos `ignore` y sus directorios si no existen.
+- **Selección de archivos ignore:** Permite elegir a qué archivos `ignore` específicos se quiere añadir la ruta.
 
 ## 🚀 Instalación
 
@@ -55,7 +55,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 ### Añadir Archivos Individuales
 
 1.  Haz clic derecho sobre un archivo o carpeta en el explorador de archivos.
-2.  Selecciona la opción **"Add to ignore files"** en el menú contextual.
+2.  Selecciona la opción **"Add to Ignore Files and Rules"** en el menú contextual.
 3.  Se mostrará una lista con los archivos `ignore` que tienes configurados. Selecciona a cuál o cuáles quieres añadir la ruta.
 4.  ¡Listo! La ruta se añadirá automáticamente a los archivos seleccionados.
 
@@ -63,13 +63,17 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 1.  **Selecciona múltiples archivos** en el explorador manteniendo `Ctrl` (o `Cmd` en Mac) mientras haces clic en cada archivo.
 2.  Haz clic derecho sobre cualquiera de los archivos seleccionados.
-3.  Selecciona **"Add to ignore files"** en el menú contextual.
+3.  Selecciona **"Add to Ignore Files and Rules"** en el menú contextual.
 4.  La extensión procesará automáticamente **todos los archivos seleccionados** y los añadirá a los archivos ignore elegidos.
 
 ### Comandos Disponibles
 
 - `Activate AI Ignore Helper`: Activa la extensión y crea la configuración inicial.
+- `AI Ignore: Add Rule`: Añade una nueva regla al listado (sin editar archivos manualmente).
+- `AI Ignore: Remove Rule`: Elimina una regla existente del listado.
 - `Open AI Ignore Helper Configuration`: Abre el archivo de configuración para editarlo.
+- `AI Ignore: Sync from JSON to Settings`: Importa configuración desde el JSON a Settings.
+- `AI Ignore: Sync from Settings to JSON`: Exporta configuración desde Settings al JSON.
 
 ## ⚙️ Configuración
 
@@ -87,48 +91,50 @@ También puedes editar directamente el archivo `settings.json` de tu workspace:
 
 ```json
 {
-  "ai-ignore.ignoreFiles": [
-    {
-      "name": "Trae Ignore",
-      "path": ".trae/.ignore",
-      "description": "Archivo ignore para Trae AI",
-      "createIfNotExists": true,
-      "enabled": true
-    },
-    {
-      "name": "Docker Ignore",
-      "path": ".dockerignore",
-      "description": "Archivo ignore para Docker",
-      "createIfNotExists": true,
-      "enabled": true
-    },
-    {
-      "name": "NPM Ignore",
-      "path": ".npmignore",
-      "description": "Archivo ignore para NPM",
-      "createIfNotExists": true,
-      "enabled": true
-    }
-  ],
-  "ai-ignore.showSelectionMenu": true,
-  "ai-ignore.allowMultipleSelection": true,
-  "ai-ignore.createDirectories": true,
-  "ai-ignore.showConfirmation": true
+	"ai-ignore.ignoreFiles": [
+		{
+			"name": "Trae Ignore",
+			"path": ".trae/.ignore",
+			"description": "Archivo ignore para Trae AI",
+			"createIfNotExists": true,
+			"enabled": true
+		},
+		{
+			"name": "Docker Ignore",
+			"path": ".dockerignore",
+			"description": "Archivo ignore para Docker",
+			"createIfNotExists": true,
+			"enabled": true
+		},
+		{
+			"name": "NPM Ignore",
+			"path": ".npmignore",
+			"description": "Archivo ignore para NPM",
+			"createIfNotExists": true,
+			"enabled": true
+		}
+	],
+	"ai-ignore.showSelectionMenu": true,
+	"ai-ignore.allowMultipleSelection": true,
+	"ai-ignore.createDirectories": true,
+	"ai-ignore.showConfirmation": true
 }
 ```
 
-### 3. Sincronización con archivo JSON (Legacy)
+### 3. Sincronización con archivo JSON (Automática + Manual)
 
-La extensión mantiene compatibilidad con el archivo `config/ignore-files-config.json` y proporciona comandos para sincronizar entre ambos formatos:
+La extensión sincroniza automáticamente los cambios en `config/ignore-files-config.json` hacia los Settings de VS Code (JSON → Settings) al guardar el archivo. Además, mantiene comandos de sincronización manual entre ambos formatos:
 
 - **AI Ignore: Sync from JSON to Settings** - Importa configuración desde el archivo JSON
 - **AI Ignore: Sync from Settings to JSON** - Exporta configuración actual a archivo JSON
 
+Esto permite que añadir o eliminar reglas en el JSON actualice el desplegable del botón derecho sin necesidad de reempaquetar la extensión ni recargar.
+
 ## 🛠️ Tecnologías Utilizadas
 
--   **JavaScript**
--   **Node.js**
--   **Visual Studio Code API**
+- **JavaScript**
+- **Node.js**
+- **Visual Studio Code API**
 
 ## 🤝 Cómo Contribuir
 
@@ -163,18 +169,45 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 - **`ai-ignore.syncToJSON`**: Exporta configuración actual de VS Code Settings al archivo JSON
 - **Sincronización automática**: Al guardar configuración, se actualiza automáticamente el archivo JSON
 
+### Añadir/Eliminar reglas rápidamente
+
+#### Opción A: Paleta de comandos (recomendado)
+
+1. Ejecuta `AI Ignore: Add Rule` (ver botón 1 en la captura) y completa los campos (name, path, description, createIfNotExists, enabled)
+2. Haz clic derecho sobre un archivo/carpeta → "Add to Ignore Files and Rules" y verifica que aparece la nueva regla
+3. Para eliminar, usa `AI Ignore: Remove Rule` (ver botón 2 en la captura)
+
+#### Opción B: Editando JSON directamente
+
+1. Abre `Open AI Ignore Helper Configuration` (abre `config/ignore-files-config.json`)
+2. Añade un objeto como:
+
+```json
+{
+	"name": "Cursor Ignore",
+	"path": ".cursorignore",
+	"description": "Archivo ignore para Cursor",
+	"createIfNotExists": true,
+	"enabled": true
+}
+```
+
+3. Guarda el archivo. El watcher sincroniza JSON → Settings automáticamente y la regla aparece/desaparece en el menú al instante.
+
 ### Solución de Problemas
 
 #### La configuración no se sincroniza automáticamente
 
-**Problema**: Los cambios en VS Code Settings no se reflejan automáticamente en el menú "Add to ignore files".
+**Problema**: Los cambios en VS Code Settings no se reflejan automáticamente en el menú "Add to Ignore Files and Rules".
 
 **Soluciones implementadas en v1.2.3**:
+
 - **Activación automática**: La extensión se activa al iniciar VS Code para registrar el listener de configuración
 - **Detección inteligente de scope**: Maneja correctamente User Settings y Workspace Settings
 - **Logs de depuración**: Permite identificar problemas de sincronización
 
 **Si persiste el problema**:
+
 1. **Verifica el scope**: Asegúrate de editar en el mismo scope (User vs Workspace Settings)
 2. **Recarga la ventana**: Ejecuta "Developer: Reload Window" desde la paleta de comandos
 3. **Sincronización manual**: Ejecuta `AI Ignore: Sync from JSON` desde la paleta de comandos
@@ -192,30 +225,41 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Versiones
 
-- **Versión actual**: 2.0.6
-- **Última mejora**: Icono visual añadido a la extensión
+- **Versión actual**: 2.0.8
+- **Última mejora**: Sincronización automática JSON → Settings y nuevos comandos de reglas
 - **Compatibilidad**: VS Code 1.60.0 y superior
 
 #### Historial de Versiones
 
+**v2.0.8**
+
+- **Menú contextual**: Cambiado a "Add to Ignore Files and Rules".
+- **Nuevos comandos**: `AI Ignore: Add Rule` y `AI Ignore: Remove Rule` para gestionar reglas sin editar archivos.
+- **Sincronización automática**: Watcher de `config/ignore-files-config.json` que sincroniza JSON → Settings al guardar.
+- **Uso inmediato**: Al añadir o eliminar reglas, aparecen/desaparecen del menú sin reempaquetar ni recargar.
+
 **v2.0.6**
+
 - **Icono visual**: Añadido icono oficial a la extensión para mejor identificación en el marketplace y panel de extensiones de VS Code.
 - **Mejora de UX**: La extensión ahora es más fácil de identificar visualmente entre otras extensiones instaladas.
 - **Recursos gráficos**: Incluye archivos de icono en formato PNG y SVG en la carpeta `/images`.
 
 **v2.0.4**
+
 - **Configuración extendida**: Añadidos 11 nuevos tipos de archivos ignore (ESLint, Prettier, Sourcegraph, Jest, Webpack, Babel, Stylelint, Markdownlint, TypeScript, Roocode, Cline) para un total de 15 archivos ignore soportados.
 - **Sincronización inteligente bidireccional**: La extensión ahora detecta automáticamente cuál fuente (VS Code Settings o archivo JSON) tiene más configuraciones y sincroniza desde la fuente más completa.
 - **Detección automática de configuración**: Al inicializar, la extensión compara el número de archivos ignore en ambas fuentes y prioriza la que tenga más elementos configurados.
 - **Compatibilidad mejorada**: Mantiene retrocompatibilidad total con configuraciones existentes mientras permite expansión automática.
 
 **v1.2.3**
+
 - **Activación automática**: La extensión ahora se activa automáticamente al iniciar VS Code (usando `"*"` en activationEvents) para garantizar que el listener de configuración se registre correctamente.
 - **Sincronización inteligente**: Mejorada la detección del scope de configuración (User Settings vs Workspace Settings) para una sincronización más precisa.
 - **Logs de depuración**: Añadidos logs detallados para facilitar la identificación de problemas de sincronización.
 - **Compatibilidad mejorada**: La extensión ahora maneja correctamente tanto User Settings como Workspace Settings según el contexto.
 
 **v1.2.0**
+
 - **Sincronización mejorada**: Se corrigió el problema donde la configuración "GIT Ignore" no aparecía en el menú desplegable. La extensión ahora sincroniza correctamente entre VS Code Settings y el archivo JSON local.
 - **Comando de sincronización**: Se añadió el comando `AI Ignore: Sync from JSON` para forzar la sincronización manual cuando sea necesario.
 
@@ -224,11 +268,29 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 - Rendimiento: Se recomienda no procesar más de 100 archivos simultáneamente
 - Rutas: Puede tener problemas con caracteres especiales en algunos sistemas
 - Ubicación: Solo funciona con archivos dentro del workspace actual
-- La sincronización JSON es unidireccional (requiere comandos manuales)
+  // Eliminado: ahora existe sincronización automática JSON → Settings mediante watcher.
+
+## 📸 Capturas
+
+Puedes incluir capturas en este README añadiendo imágenes a la carpeta `images/` y referenciándolas con rutas relativas, por ejemplo:
+
+```md
+![Menú contextual](images/ejemplo-menu-contextual.png)
+```
+
+Captura de la paleta de comandos con numeración de botones:
+
+![Paleta de comandos AI Ignore Helper](images/ai-ignore-helper-menu.png)
+
+Recomendaciones:
+
+- Usa formatos PNG o SVG en `images/`
+- Nombra los archivos de forma descriptiva (ej. `add-rule-quickpick.png`)
+- Verifica la vista previa del README en VS Code para confirmar que se ven correctamente
 
 ## 👤 Autor
 
--   **Juan Luis Martel Revuelta** - @usblsb
+- **Juan Luis Martel Revuelta** - @usblsb
 
 ## 📄 Licencia
 
