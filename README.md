@@ -1,6 +1,7 @@
 # AI Ignore Helper
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![Author](https://img.shields.io/badge/author-usblsb-blue)](https://github.com/usblsb)
 
 Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos `.ignore` de forma rápida y sencilla.
 
@@ -32,7 +33,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ### Instalación desde VSIX (Recomendado)
 
-1.  Descarga el archivo `ai-ignore-helper-1.1.11.vsix` desde el repositorio.
+1.  Descarga el archivo `ai-ignore-helper-3.0.0.vsix` desde el repositorio.
 2.  Abre **Visual Studio Code**.
 3.  Ve a la vista de **Extensiones** (puedes usar el atajo `Ctrl+Shift+X`).
 4.  Haz clic en el menú de tres puntos (...) y selecciona **"Install from VSIX..."**.
@@ -225,11 +226,17 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Versiones
 
-- **Versión actual**: 2.0.8
-- **Última mejora**: Sincronización automática JSON → Settings y nuevos comandos de reglas
+- **Versión actual**: 3.0.0
+- **Última mejora**: Sincronización automática JSON → Settings, nuevos comandos de reglas, mejoras de documentación y flujo de trabajo
 - **Compatibilidad**: VS Code 1.60.0 y superior
 
 #### Historial de Versiones
+
+**v3.0.0**
+
+- Publicación estable con sincronización automática JSON → Settings y comandos `Add/Remove Rule`
+- Documentación actualizada con capturas y referencias a botones numerados
+- Cambio del texto del menú contextual a "Add to Ignore Files and Rules"
 
 **v2.0.8**
 
@@ -290,7 +297,7 @@ Recomendaciones:
 
 ## 👤 Autor
 
-- **Juan Luis Martel Revuelta** - @usblsb
+- **Juan Luis Martel Revuelta** - [@usblsb](https://github.com/usblsb) · Web: https://usblsb.com
 
 ## 📄 Licencia
 
