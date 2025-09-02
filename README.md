@@ -107,13 +107,20 @@ También puedes editar directamente el archivo `settings.json` de tu workspace:
 			"createIfNotExists": true,
 			"enabled": true
 		},
-		{
-			"name": "NPM Ignore",
-			"path": ".npmignore",
-			"description": "Archivo ignore para NPM",
-			"createIfNotExists": true,
-			"enabled": true
-		}
+    {
+        "name": "NPM Ignore",
+        "path": ".npmignore",
+        "description": "Archivo ignore para NPM",
+        "createIfNotExists": true,
+        "enabled": true
+    },
+    {
+        "name": "Vercel Ignore",
+        "path": ".vercelignore",
+        "description": "Archivo ignore para Vercel",
+        "createIfNotExists": true,
+        "enabled": true
+    }
 	],
 	"ai-ignore.showSelectionMenu": true,
 	"ai-ignore.allowMultipleSelection": true,
@@ -226,8 +233,8 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Versiones
 
-- **Versión actual**: 3.0.0
-- **Última mejora**: Sincronización automática JSON → Settings, nuevos comandos de reglas, mejoras de documentación y flujo de trabajo
+- **Versión actual**: 3.0.1
+- **Última mejora**: Añadido soporte por defecto para `.vercelignore`
 - **Compatibilidad**: VS Code 1.60.0 y superior
 
 #### Historial de Versiones
@@ -237,6 +244,10 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 - Publicación estable con sincronización automática JSON → Settings y comandos `Add/Remove Rule`
 - Documentación actualizada con capturas y referencias a botones numerados
 - Cambio del texto del menú contextual a "Add to Ignore Files and Rules"
+
+**v3.0.1**
+
+- Añadido archivo por defecto `Vercel Ignore` (`.vercelignore`) a la configuración y ejemplo del README
 
 **v2.0.8**
 

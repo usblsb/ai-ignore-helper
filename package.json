@@ -3,7 +3,7 @@
 	"publisher": "usblsb",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-	"version": "3.0.0",
+    "version": "3.0.1",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.60.0"
@@ -69,6 +69,13 @@
 							"name": "NPM Ignore",
 							"path": ".npmignore",
 							"description": "Archivo ignore para NPM",
+							"createIfNotExists": true,
+							"enabled": true
+						},
+						{
+							"name": "Vercel Ignore",
+							"path": ".vercelignore",
+							"description": "Archivo ignore para Vercel",
 							"createIfNotExists": true,
 							"enabled": true
 						},

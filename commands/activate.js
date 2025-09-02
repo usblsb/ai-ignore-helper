@@ -40,6 +40,13 @@ async function activate() {
 						"enabled": true
 					},
 					{
+						"name": "Vercel Ignore",
+						"path": ".vercelignore",
+						"description": "Archivo ignore para Vercel",
+						"createIfNotExists": true,
+						"enabled": true
+					},
+					{
 						"name": "GIT Ignore",
 						"path": ".gitignore",
 						"description": "Archivo ignore para GIT",
