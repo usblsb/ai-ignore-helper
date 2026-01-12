@@ -3,28 +3,54 @@ const path = require('path');
 const fs = require('fs').promises;
 const configManager = require('./config_manager');
 
+/**
+ * Normaliza un recurso para obtener una Uri válida.
+ * Maneja tanto recursos del explorador de archivos (Uri) como recursos del SCM (SourceControlResourceState).
+ * @param {vscode.Uri | {resourceUri: vscode.Uri}} resource - El recurso a normalizar
+ * @returns {vscode.Uri | null} - La Uri normalizada o null si no es válida
+ */
+function normalizeResource(resource) {
+    if (!resource) {
+        return null;
+    }
+
+    // Si es un SourceControlResourceState del SCM, tiene una propiedad resourceUri
+    if (resource.resourceUri && resource.resourceUri.fsPath) {
+        return resource.resourceUri;
+    }
+
+    // Si es una Uri directa del explorador de archivos
+    if (resource.fsPath) {
+        return resource;
+    }
+
+    return null;
+}
+
 async function addToIgnore(contextSelection, allSelections) {
     try {
         // Manejar los parámetros según cómo VS Code los pasa:
         // - contextSelection: el archivo en el que se hizo clic derecho
         // - allSelections: array con todos los archivos seleccionados
+        // - Los recursos pueden venir del explorador (Uri) o del SCM (SourceControlResourceState)
         let resources = [];
-        
+
         if (allSelections && Array.isArray(allSelections) && allSelections.length > 0) {
-            // Usar todos los archivos seleccionados
-            resources = allSelections;
+            // Usar todos los archivos seleccionados y normalizar los recursos
+            resources = allSelections.map(normalizeResource).filter(r => r !== null);
         } else if (contextSelection) {
             // Usar solo el archivo en el que se hizo clic derecho
-            resources = [contextSelection];
-        } else {
+            const normalizedResource = normalizeResource(contextSelection);
+            if (normalizedResource) {
+                resources = [normalizedResource];
+            }
+        }
+
+        if (resources.length === 0) {
             vscode.window.showErrorMessage('No resource selected');
             return;
         }
 
-        if (resources.length === 0) {
-            vscode.window.showErrorMessage('No resources selected');
-            return;
-        }
 
         // Cargar configuración
         const config = configManager.loadConfig();

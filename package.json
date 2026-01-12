@@ -3,7 +3,7 @@
 	"publisher": "usblsb",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-    "version": "3.0.1",
+    "version": "3.0.2",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.60.0"
@@ -162,6 +162,13 @@
 							"description": "Archivo ignore para Cline AI",
 							"createIfNotExists": true,
 							"enabled": true
+						},
+						{
+							"name": "Gemini Ignore",
+							"path": ".geminiignore",
+							"description": "Archivo ignore para Gemini CLI",
+							"createIfNotExists": true,
+							"enabled": true
 						}
 					],
 					"description": "Lista de archivos ignore configurados para la extensión"
@@ -229,6 +236,18 @@
 					"command": "ai-ignore.openConfig",
 					"when": "resourceFilename == ''",
 					"group": "z_commands"
+				}
+			],
+			"scm/resourceState/context": [
+				{
+					"command": "ai-ignore.addToIgnore",
+					"group": "1_modification"
+				}
+			],
+			"scm/resourceFolder/context": [
+				{
+					"command": "ai-ignore.addToIgnore",
+					"group": "1_modification"
 				}
 			],
 			"commandPalette": [
