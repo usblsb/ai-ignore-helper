@@ -1,2 +1,4 @@
 
 *.vsix
+.agent/metrics/metrics_20260112_131717.json
+.geminiignore

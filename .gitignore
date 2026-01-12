@@ -8,3 +8,6 @@ add-rules
 reglas_llm
 PROMPT.md
 documentacion_del_proyecto/uso_de_ralph.md
+.agent/metrics/metrics_20260112_131717.json
+.geminiignore
+.gitignore
