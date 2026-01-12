@@ -39,8 +39,8 @@ async function updateVSCodeSettings(jsonConfig) {
   try {
     // Evitar bucles: marcamos que estamos actualizando desde JSON
     isSyncingFromJSON = true;
-    // Determinar el target apropiado: Global si no hay workspace, Workspace si existe
-    const target = vscode.workspace.workspaceFolders ? vscode.ConfigurationTarget.Workspace : vscode.ConfigurationTarget.Global;
+    // Usar Global por defecto para evitar polución del workspace (.vscode/settings.json)
+    const target = vscode.ConfigurationTarget.Global;
 
     // Actualizar archivos ignore
     await config.update('ignoreFiles', jsonConfig.ignoreFiles, target);

@@ -1,161 +1,20 @@
 const vscode = require('vscode');
-const path = require('path');
-const fs = require('fs');
-const configManager = require('./config_manager');
 const fileCreator = require('./file_creator');
-const writeSettings = require('../controllers/write-settings');
 
 async function activate() {
 	try {
-		// Create config directory if it doesn't exist
-		const configDir = path.join(vscode.workspace.rootPath, 'config');
-		if (!fs.existsSync(configDir)) {
-			fs.mkdirSync(configDir, { recursive: true });
-		}
-
-		// Create config file if it doesn't exist
-		const configPath = path.join(configDir, 'ignore-files-config.json');
-		if (!fs.existsSync(configPath)) {
-			const defaultConfig = {
-				ignoreFiles: [
-					{
-						"name": "Trae Ignore",
-						"path": ".trae/.ignore",
-						"description": "Archivo ignore para Trae AI",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Docker Ignore",
-						"path": ".dockerignore",
-						"description": "Archivo ignore para Docker",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "NPM Ignore",
-						"path": ".npmignore",
-						"description": "Archivo ignore para NPM",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Vercel Ignore",
-						"path": ".vercelignore",
-						"description": "Archivo ignore para Vercel",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "GIT Ignore",
-						"path": ".gitignore",
-						"description": "Archivo ignore para GIT",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "ESLint Ignore",
-						"path": ".eslintignore",
-						"description": "Archivo ignore para ESLint",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Prettier Ignore",
-						"path": ".prettierignore",
-						"description": "Archivo ignore para Prettier",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Sourcegraph Ignore",
-						"path": ".sourcegraphignore",
-						"description": "Archivo ignore para Sourcegraph Cody",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Jest Ignore",
-						"path": ".jestignore",
-						"description": "Archivo ignore para Jest",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Webpack Ignore",
-						"path": ".webpackignore",
-						"description": "Archivo ignore para Webpack",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Babel Ignore",
-						"path": ".babelignore",
-						"description": "Archivo ignore para Babel",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Stylelint Ignore",
-						"path": ".stylelintignore",
-						"description": "Archivo ignore para Stylelint",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Markdownlint Ignore",
-						"path": ".markdownlintignore",
-						"description": "Archivo ignore para Markdownlint",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "TypeScript Ignore",
-						"path": ".tsignore",
-						"description": "Archivo ignore para TypeScript",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Roocode Ignore",
-						"path": ".roocodeignore",
-						"description": "Archivo ignore para Roocode AI",
-						"createIfNotExists": true,
-						"enabled": true
-					},
-					{
-						"name": "Cline Ignore",
-						"path": ".clineignore",
-						"description": "Archivo ignore para Cline AI",
-						"createIfNotExists": true,
-						"enabled": true
-					}
-				],
-				defaultBehavior: {
-					showSelectionMenu: true,
-					allowMultipleSelection: true,
-					createDirectories: true,
-					showConfirmation: true
-				}
-			};
-
-			fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
-		}
-
-		// Load configuration
-		const config = configManager.loadConfig();
+		// Load configuration from settingsSync instead of local file
+		const vscodeConfig = vscode.workspace.getConfiguration('ai-ignore');
+		const ignoreFiles = vscodeConfig.get('ignoreFiles', []);
 
 		// Create ignore files if they don't exist
-		for (const ignoreFile of config.ignoreFiles) {
+		for (const ignoreFile of ignoreFiles) {
 			if (ignoreFile.enabled && ignoreFile.createIfNotExists) {
 				await fileCreator.createIgnoreFile(ignoreFile.path);
 			}
 		}
 
-		// Write VSCode settings
-		await writeSettings.updateSettings();
-
-		vscode.window.showInformationMessage('AI Ignore Helper activated successfully!');
+		vscode.window.showInformationMessage('AI Ignore Helper: Ignore files checked/created successfully!');
 	} catch (error) {
 		vscode.window.showErrorMessage(`Error activating AI Ignore Helper: ${error.message}`);
 	}

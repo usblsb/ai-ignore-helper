@@ -26,35 +26,6 @@ function loadConfig() {
 }
 
 /**
- * Carga la configuración desde el archivo JSON (método legacy)
- * @returns {Object|null} Configuración cargada o null si hay error
- */
-function loadConfigFromJSON() {
-	try {
-		// Construir la ruta al archivo de configuración
-		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-		if (!workspaceRoot) {
-			throw new Error('No workspace folder found');
-		}
-		
-		const configPath = path.join(workspaceRoot, 'config', 'ignore-files-config.json');
-		
-		// Verificar que el archivo de configuración existe
-		if (!fs.existsSync(configPath)) {
-			throw new Error('Configuration file not found. Please activate the extension first.');
-		}
-		
-		// Leer y parsear el contenido JSON
-		const configContent = fs.readFileSync(configPath, 'utf8');
-		return JSON.parse(configContent);
-	} catch (error) {
-		// Mostrar error al usuario y retornar null
-		vscode.window.showErrorMessage(`Error loading JSON configuration: ${error.message}`);
-		return null;
-	}
-}
-
-/**
  * Guarda la configuración en VS Code Settings (método principal)
  * @param {Object} config - Configuración a guardar
  * @returns {boolean} true si se guardó exitosamente, false en caso de error
@@ -63,22 +34,20 @@ async function saveConfig(config) {
 	try {
 		const vsConfig = vscode.workspace.getConfiguration('ai-ignore');
 		
+		// Determinar el target: Preferimos Global para evitar polución, 
+		// pero si el usuario ya tiene configuraciones en el workspace, mantenemos la coherencia
+		const target = vscode.workspace.workspaceFolders ? vscode.ConfigurationTarget.Global : vscode.ConfigurationTarget.Global;
+		// Nota: Forzamos Global por ahora según los requerimientos de no polución.
+
 		// Actualizar archivos ignore
-		await vsConfig.update('ignoreFiles', config.ignoreFiles, vscode.ConfigurationTarget.Workspace);
+		await vsConfig.update('ignoreFiles', config.ignoreFiles, target);
 		
 		// Actualizar comportamiento por defecto si existe
 		if (config.defaultBehavior) {
-			await vsConfig.update('showSelectionMenu', config.defaultBehavior.showSelectionMenu, vscode.ConfigurationTarget.Workspace);
-			await vsConfig.update('allowMultipleSelection', config.defaultBehavior.allowMultipleSelection, vscode.ConfigurationTarget.Workspace);
-			await vsConfig.update('createDirectories', config.defaultBehavior.createDirectories, vscode.ConfigurationTarget.Workspace);
-			await vsConfig.update('showConfirmation', config.defaultBehavior.showConfirmation, vscode.ConfigurationTarget.Workspace);
-		}
-		
-		// Sincronizar automáticamente al archivo JSON
-		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-		if (workspaceRoot) {
-			const configPath = path.join(workspaceRoot, 'config', 'ignore-files-config.json');
-			await settingsSync.updateJSONFromSettings(configPath);
+			await vsConfig.update('showSelectionMenu', config.defaultBehavior.showSelectionMenu, target);
+			await vsConfig.update('allowMultipleSelection', config.defaultBehavior.allowMultipleSelection, target);
+			await vsConfig.update('createDirectories', config.defaultBehavior.createDirectories, target);
+			await vsConfig.update('showConfirmation', config.defaultBehavior.showConfirmation, target);
 		}
 		
 		return true;
@@ -89,33 +58,7 @@ async function saveConfig(config) {
 	}
 }
 
-/**
- * Guarda la configuración al archivo JSON (método legacy)
- * @param {Object} config - Configuración a guardar
- * @returns {boolean} true si se guardó exitosamente, false en caso de error
- */
-function saveConfigToJSON(config) {
-	try {
-		// Construir la ruta al archivo de configuración
-		const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-		if (!workspaceRoot) {
-			throw new Error('No workspace folder found');
-		}
-		
-		const configPath = path.join(workspaceRoot, 'config', 'ignore-files-config.json');
-		// Escribir la configuración con formato JSON legible (indentación de 2 espacios)
-		fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-		return true;
-	} catch (error) {
-		// Mostrar error al usuario y retornar false
-		vscode.window.showErrorMessage(`Error saving JSON configuration: ${error.message}`);
-		return false;
-	}
-}
-
 module.exports = {
 	loadConfig,
-	saveConfig,
-	loadConfigFromJSON,
-	saveConfigToJSON
+	saveConfig
 };
