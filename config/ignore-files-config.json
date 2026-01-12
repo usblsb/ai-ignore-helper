@@ -111,6 +111,13 @@
       "description": "Archivo Ignore para Cursor",
       "createIfNotExists": true,
       "enabled": true
+    },
+    {
+      "name": "Gemini Ignore",
+      "path": ".geminiignore",
+      "description": "Archivo ignore para Gemini CLI",
+      "createIfNotExists": true,
+      "enabled": true
     }
   ],
   "defaultBehavior": {

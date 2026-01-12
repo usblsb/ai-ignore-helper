@@ -22,7 +22,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ## ✨ Características Principales
 
-- **Añadir a múltiples archivos ignore:** Permite agregar una carpeta o archivo a varios archivos `.ignore` (como `.dockerignore`, `.npmignore`, `.trae/.ignore`, etc.) de una sola vez.
+- **Añadir a múltiples archivos ignore:** Permite agregar una carpeta o archivo a varios archivos `.ignore` (como `.dockerignore`, `.npmignore`, `.trae/.ignore`, `.geminiignore`, etc.) de una sola vez.
 - **Menú contextual:** Se integra con el menú del explorador de archivos de VS Code (clic derecho sobre un archivo o carpeta).
 - **Selección múltiple de archivos:** Soporta correctamente la selección múltiple de archivos desde el explorador, procesando todos los archivos seleccionados en una sola operación.
 - **Altamente configurable:** Los usuarios pueden definir sus propios archivos `ignore` a través de un archivo `JSON` de configuración.
@@ -33,7 +33,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ### Instalación desde VSIX (Recomendado)
 
-1.  Descarga el archivo `ai-ignore-helper-3.0.0.vsix` desde el repositorio.
+1.  Descarga el archivo `ai-ignore-helper-3.0.2.vsix` desde el repositorio.
 2.  Abre **Visual Studio Code**.
 3.  Ve a la vista de **Extensiones** (puedes usar el atajo `Ctrl+Shift+X`).
 4.  Haz clic en el menú de tres puntos (...) y selecciona **"Install from VSIX..."**.
@@ -233,17 +233,15 @@ La extensión implementa correctamente el manejo de selecciones múltiples sigui
 
 ### Versiones
 
-- **Versión actual**: 3.0.1
-- **Última mejora**: Añadido soporte por defecto para `.vercelignore`
+- **Versión actual**: 3.0.2
+- **Última mejora**: Añadido soporte por defecto para `.geminiignore`
 - **Compatibilidad**: VS Code 1.60.0 y superior
 
 #### Historial de Versiones
 
-**v3.0.0**
+**v3.0.2**
 
-- Publicación estable con sincronización automática JSON → Settings y comandos `Add/Remove Rule`
-- Documentación actualizada con capturas y referencias a botones numerados
-- Cambio del texto del menú contextual a "Add to Ignore Files and Rules"
+- Añadido archivo por defecto `Gemini Ignore` (`.geminiignore`) a la configuración.
 
 **v3.0.1**
 
