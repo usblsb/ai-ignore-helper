@@ -1,5 +1,26 @@
 # Changelog
 
+## [4.2.0] - 2026-01-13
+
+### Added
+- **Sistema de Tres Listas**: Soporte para templates de múltiples orígenes:
+  - 📦 **Default**: Templates integrados (solo lectura).
+  - 🌐 **Global**: Templates del usuario sincronizados vía Settings Sync (anteriormente en globalStorage).
+  - 📁 **Project**: Nuevos templates específicos por proyecto guardados en `ai-ignore-templates.json` en la raíz del workspace.
+- **Selector de Destino**: Al crear nuevos templates, ahora se puede elegir entre guardarlos como Global o Project.
+- **Iconos Visuales**: Nuevos iconos en el TreeView para identificar fácilmente el origen de cada template (package, globe, folder).
+- **Auto-Refresh**: La vista de templates se actualiza automáticamente tras añadir, editar o eliminar entradas.
+
+### Fixed
+- **Bug Refresh**: Solucionado problema donde los nuevos templates no aparecían inmediatamente en la lista tras crearlos.
+- **Bug Enable/Disable**: Añadida opción faltante para habilitar/deshabilitar templates durante la creación (`addEntry`), igualando la funcionalidad de edición.
+
+## [4.1.1] - 2026-01-13
+- Bug fixes menores y mejoras de rendimiento.
+
+## [4.1.0] - 2026-01-13
+- **Verificación de .gitignore**: Nueva funcionalidad para detectar y limpiar archivos rastreados que deberían ser ignorados.
+
 ## [4.0.0] - 2026-01-13
 
 ### Added

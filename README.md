@@ -33,28 +33,24 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ---
 
-## 🆕 Panel "Add Ignore" (NUEVO en v4.0)
+## 🆕 Panel "Add Ignore" (Mejorado en v4.2)
 
-La versión 4.0 introduce un **panel lateral dedicado** para gestionar las plantillas de archivos ignore:
+La versión 4.2 mejora significativamente el panel de gestión con un **Sistema de Tres Listas**:
 
-### Acceso al Panel
-1. Busca el icono **"+"** en la barra de actividad (lado izquierdo de VS Code).
-2. Haz clic para abrir el panel "Add Ignore".
+### Orígenes de Templates
+El panel ahora agrupa las plantillas según su origen para mejor organización:
+
+1. 📦 **Default Templates**: Plantillas integradas en la extensión (solo lectura).
+2. 🌐 **Global Templates**: Tus plantillas personalizadas. Se guardan en la configuración de usuario y se sincronizan entre máquinas si usas Settings Sync.
+3. 📁 **Project Templates**: Plantillas específicas para el proyecto actual. Se guardan en un archivo `ai-ignore-templates.json` en la raíz de tu workspace, ideal para compartir configuraciones con tu equipo vía Git.
+
+### Gestión de Templates
+Al crear una nueva plantilla (`+`), ahora podrás elegir su destino:
+- **Global**: Para usarla en todos tus proyectos.
+- **Project**: Para que solo esté disponible en el proyecto actual.
 
 ### Operaciones CRUD
-
-| Acción | Descripción |
-|--------|-------------|
-| ➕ **Crear** | Añade nuevas plantillas con nombre, ruta y descripción personalizada |
-| ✏️ **Editar** | Modifica plantillas existentes (clic derecho o icono de lápiz) |
-| 🗑️ **Eliminar** | Elimina plantillas con confirmación previa |
-| 🔄 **Refrescar** | Actualiza la vista del panel |
-
-### Características del Panel
-- **Vista de árbol**: Lista todas las plantillas de archivos ignore configuradas.
-- **Iconos contextuales**: Botones de edición y eliminación directamente en cada elemento.
-- **Persistencia global**: Los cambios se guardan en la configuración global de VS Code.
-- **Sincronización automática**: Los cambios se reflejan inmediatamente en el menú contextual.
+Todas las operaciones (Crear, Editar, Eliminar) ahora actualizan la vista automáticamente. Además, al crear plantillas puedes establecer su estado inicial (Enabled/Disabled).
 
 ---
 
