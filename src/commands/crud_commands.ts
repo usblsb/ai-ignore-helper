@@ -8,10 +8,11 @@ import * as vscode from 'vscode';
 import { IgnoreItem, IgnoreFileConfig, ExtensionConfig } from '../types';
 import { jl_getVSCodeConfig } from './settings_sync';
 import { jl_saveConfig, jl_addIgnoreFile, jl_updateIgnoreFile, jl_removeIgnoreFile } from './config_manager';
+import { jl_saveProjectTemplate, jl_removeProjectTemplate } from '../providers/IgnoreTreeDataProvider';
 
 /**
  * Adds a new ignore template entry
- * Shows input dialogs for name, path, and description
+ * Shows input dialogs for name, path, description, enabled status, and destination
  */
 export async function jl_addEntry(): Promise<void> {
     try {
@@ -40,18 +41,59 @@ export async function jl_addEntry(): Promise<void> {
             ignoreFocusOut: true
         });
 
+        // Request enabled status
+        const enabledPick = await vscode.window.showQuickPick(
+            [
+                { label: 'Enabled', value: true, description: 'Template will be active' },
+                { label: 'Disabled', value: false, description: 'Template will be inactive' }
+            ],
+            {
+                placeHolder: 'Enable this template?'
+            }
+        );
+        if (!enabledPick) { return; }
+
+        // Request destination (global or project)
+        const destinationPick = await vscode.window.showQuickPick(
+            [
+                {
+                    label: '$(globe) Global Template',
+                    value: 'global' as const,
+                    description: 'Available in all projects, synced with Settings Sync'
+                },
+                {
+                    label: '$(folder) Project Template',
+                    value: 'project' as const,
+                    description: 'Saved in ai-ignore-templates.json in workspace root'
+                }
+            ],
+            {
+                placeHolder: 'Where to save this template?'
+            }
+        );
+        if (!destinationPick) { return; }
+
         // Create new ignore file config
         const newConfig: IgnoreFileConfig = {
             name,
             path,
             description: description || '',
             createIfNotExists: true,
-            enabled: true
+            enabled: enabledPick.value,
+            source: destinationPick.value
         };
 
-        const success = await jl_addIgnoreFile(newConfig);
+        let success: boolean;
+        if (destinationPick.value === 'project') {
+            success = await jl_saveProjectTemplate(newConfig);
+        } else {
+            success = await jl_addIgnoreFile(newConfig);
+        }
+
         if (success) {
-            vscode.window.showInformationMessage(`Added template: ${name}`);
+            vscode.window.showInformationMessage(`Added ${destinationPick.value} template: ${name}`);
+            // Force refresh of the tree view to show new template immediately
+            await vscode.commands.executeCommand('ai-ignore.refreshView');
         }
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -138,6 +180,8 @@ export async function jl_editEntry(item?: IgnoreItem): Promise<void> {
         const success = await jl_updateIgnoreFile(oldPath, updatedConfig);
         if (success) {
             vscode.window.showInformationMessage(`Updated template: ${name}`);
+            // Force refresh of the tree view
+            await vscode.commands.executeCommand('ai-ignore.refreshView');
         }
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -183,9 +227,21 @@ export async function jl_deleteEntry(item?: IgnoreItem): Promise<void> {
 
         if (confirm !== 'Yes') { return; }
 
-        const success = await jl_removeIgnoreFile(configToDelete.path);
+        // Delete from appropriate source
+        let success: boolean;
+        if (configToDelete.source === 'project') {
+            success = await jl_removeProjectTemplate(configToDelete.path);
+        } else if (configToDelete.source === 'default') {
+            vscode.window.showWarningMessage('Default templates cannot be deleted. You can disable them instead.');
+            return;
+        } else {
+            success = await jl_removeIgnoreFile(configToDelete.path);
+        }
+
         if (success) {
             vscode.window.showInformationMessage(`Deleted template: ${configToDelete.name}`);
+            // Force refresh of the tree view
+            await vscode.commands.executeCommand('ai-ignore.refreshView');
         }
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);

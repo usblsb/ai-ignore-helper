@@ -19,6 +19,8 @@ export interface IgnoreFileConfig {
     createIfNotExists: boolean;
     /** Whether this ignore file is enabled */
     enabled: boolean;
+    /** Source of template: default (package.json), global (user settings), project (ai-ignore-templates.json) */
+    source?: 'default' | 'global' | 'project';
 }
 
 /**
@@ -54,9 +56,26 @@ export class IgnoreItem extends vscode.TreeItem {
         public readonly collapsibleState: vscode.TreeItemCollapsibleState = vscode.TreeItemCollapsibleState.None
     ) {
         super(config.name, collapsibleState);
-        this.tooltip = `${config.description}\nPath: ${config.path}`;
+        this.tooltip = `${config.description}\nPath: ${config.path}\nSource: ${config.source || 'global'}`;
         this.description = config.path;
         this.contextValue = 'ignoreItem';
-        this.iconPath = new vscode.ThemeIcon(config.enabled ? 'file' : 'file-symlink-file');
+
+        // Icon based on source and enabled status
+        if (!config.enabled) {
+            this.iconPath = new vscode.ThemeIcon('circle-slash');
+        } else {
+            switch (config.source) {
+                case 'default':
+                    this.iconPath = new vscode.ThemeIcon('package');
+                    break;
+                case 'project':
+                    this.iconPath = new vscode.ThemeIcon('folder');
+                    break;
+                case 'global':
+                default:
+                    this.iconPath = new vscode.ThemeIcon('globe');
+                    break;
+            }
+        }
     }
 }
