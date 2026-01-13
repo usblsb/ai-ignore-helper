@@ -16,6 +16,7 @@ import { jl_addRule } from './commands/add_rule';
 import { jl_removeRule } from './commands/remove_rule';
 import { jl_initializeSync, jl_syncFromJSON, jl_syncToJSON } from './commands/settings_sync';
 import { jl_addEntry, jl_editEntry, jl_deleteEntry } from './commands/crud_commands';
+import { jl_checkGitignoreSync } from './commands/jl_check_gitignore';
 
 // Controllers
 import { jl_toggleAdding } from './controllers/toggle_adding';
@@ -129,6 +130,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         () => ignoreTreeDataProvider.refresh()
     );
 
+    // Register gitignore sync check command
+    const checkGitignoreSyncDisposable = vscode.commands.registerCommand(
+        'ai-ignore.checkGitignoreSync',
+        jl_checkGitignoreSync
+    );
+
     // Register context menu toggle
     jl_toggleAdding(context);
 
@@ -144,7 +151,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         addEntryDisposable,
         editEntryDisposable,
         deleteEntryDisposable,
-        refreshViewDisposable
+        refreshViewDisposable,
+        checkGitignoreSyncDisposable
     );
 }
 

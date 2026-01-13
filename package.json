@@ -3,7 +3,7 @@
 	"publisher": "usblsb",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-	"version": "4.0.2",
+	"version": "4.1.0",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.75.0"
@@ -265,6 +265,11 @@
 				"command": "ai-ignore.refreshView",
 				"title": "AI Ignore: Refresh Templates",
 				"icon": "$(refresh)"
+			},
+			{
+				"command": "ai-ignore.checkGitignoreSync",
+				"title": "AI Ignore: Check Gitignore Sync",
+				"icon": "$(warning)"
 			}
 		],
 		"menus": {
@@ -318,6 +323,11 @@
 				},
 				{
 					"command": "ai-ignore.refreshView",
+					"when": "view == ai-ignore-view",
+					"group": "navigation"
+				},
+				{
+					"command": "ai-ignore.checkGitignoreSync",
 					"when": "view == ai-ignore-view",
 					"group": "navigation"
 				}
