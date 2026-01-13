@@ -52,23 +52,25 @@ async function jl_getTrackedIgnoredFiles(workspacePath: string): Promise<Tracked
 
     const files = trackedFiles.split('\n').filter(f => f.length > 0);
 
-    // Check each file against .gitignore using git check-ignore
+    // Check each file against .gitignore using git check-ignore with --no-index
+    // --no-index forces git to check the file against .gitignore even if it's tracked
     for (const file of files) {
         try {
-            // git check-ignore returns 0 if file is ignored, 1 if not
-            const result = await jl_execGitCommand(
-                workspacePath,
-                `git check-ignore -q "${file}" && echo "ignored" || echo "not-ignored"`
+            // Use --no-index to bypass the index and check directly against .gitignore
+            const { stdout } = await execAsync(
+                `git check-ignore --no-index "${file}"`,
+                { cwd: workspacePath }
             );
 
-            if (result === 'ignored') {
+            // If command succeeds (exit code 0), the file matches a .gitignore pattern
+            if (stdout.trim()) {
                 problems.push({
                     path: file,
                     label: `$(file) ${file}`
                 });
             }
         } catch {
-            // Ignore errors for individual files
+            // Exit code 1 means file is NOT ignored, which is expected for most files
         }
     }
 

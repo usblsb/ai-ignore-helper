@@ -3,7 +3,7 @@
 	"publisher": "usblsb",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-	"version": "4.1.0",
+	"version": "4.1.1",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.75.0"
