@@ -10,6 +10,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 ## Tabla de Contenidos
 
 - ✨ Características Principales
+- 🆕 Panel "Add Ignore" (NUEVO en v4.0)
 - 🚀 Instalación
 - 💻 Uso
 - ⚙️ Configuración
@@ -29,11 +30,38 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 - **Creación automática:** Puede crear los archivos `ignore` y sus directorios si no existen.
 - **Selección de archivos ignore:** Permite elegir a qué archivos `ignore` específicos se quiere añadir la ruta.
 
+---
+
+## 🆕 Panel "Add Ignore" (NUEVO en v4.0)
+
+La versión 4.0 introduce un **panel lateral dedicado** para gestionar las plantillas de archivos ignore:
+
+### Acceso al Panel
+1. Busca el icono **"+"** en la barra de actividad (lado izquierdo de VS Code).
+2. Haz clic para abrir el panel "Add Ignore".
+
+### Operaciones CRUD
+
+| Acción | Descripción |
+|--------|-------------|
+| ➕ **Crear** | Añade nuevas plantillas con nombre, ruta y descripción personalizada |
+| ✏️ **Editar** | Modifica plantillas existentes (clic derecho o icono de lápiz) |
+| 🗑️ **Eliminar** | Elimina plantillas con confirmación previa |
+| 🔄 **Refrescar** | Actualiza la vista del panel |
+
+### Características del Panel
+- **Vista de árbol**: Lista todas las plantillas de archivos ignore configuradas.
+- **Iconos contextuales**: Botones de edición y eliminación directamente en cada elemento.
+- **Persistencia global**: Los cambios se guardan en la configuración global de VS Code.
+- **Sincronización automática**: Los cambios se reflejan inmediatamente en el menú contextual.
+
+---
+
 ## 🚀 Instalación
 
 ### Instalación desde VSIX (Recomendado)
 
-1.  Descarga el archivo `ai-ignore-helper-3.0.4.vsix` desde el repositorio.
+1.  Descarga el archivo `ai-ignore-helper-4.0.0.vsix` desde el repositorio.
 2.  Abre **Visual Studio Code**.
 3.  Ve a la vista de **Extensiones** (puedes usar el atajo `Ctrl+Shift+X`).
 4.  Haz clic en el menú de tres puntos (...) y selecciona **"Install from VSIX..."**.
@@ -69,12 +97,17 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 ### Comandos Disponibles
 
-- `Activate AI Ignore Helper`: Verifica y asegura que los archivos ignore habilitados existan.
-- `AI Ignore: Add Rule`: Añade una nueva regla al listado global.
-- `AI Ignore: Remove Rule`: Elimina una regla existente del listado global.
-- `Open AI Ignore Helper Configuration`: Abre el archivo de configuración global (almacenado en el Global Storage de VS Code).
-- `AI Ignore: Sync from JSON to Settings`: Sincroniza la configuración desde el archivo JSON global a VS Code Settings.
-- `AI Ignore: Sync from Settings to JSON`: Sincroniza la configuración desde VS Code Settings al archivo JSON global.
+| Comando | Descripción |
+|---------|-------------|
+| `Activate AI Ignore Helper` | Verifica y crea los archivos ignore habilitados |
+| `AI Ignore: Add Rule` | Añade una nueva regla al listado global |
+| `AI Ignore: Remove Rule` | Elimina una regla existente del listado global |
+| `AI Ignore: Add Template` | Añade una plantilla desde el panel lateral |
+| `AI Ignore: Edit Template` | Edita una plantilla existente |
+| `AI Ignore: Delete Template` | Elimina una plantilla (con confirmación) |
+| `Open AI Ignore Helper Configuration` | Abre el archivo de configuración global |
+| `AI Ignore: Sync from JSON to Settings` | Sincroniza desde JSON a VS Code Settings |
+| `AI Ignore: Sync from Settings to JSON` | Sincroniza desde VS Code Settings a JSON |
 
 ## ⚙️ Configuración
 
@@ -86,11 +119,15 @@ La extensión utiliza un sistema de almacenamiento global para evitar ensuciar t
 2. Busca "AI Ignore" en la barra de búsqueda
 3. Configura los archivos ignore y comportamientos desde la interfaz gráfica. Los cambios se aplicarán de forma global.
 
-### 2. Configuración desde archivo JSON global
+### 2. Configuración desde el Panel "Add Ignore"
 
-Puedes editar directamente el archivo de configuración JSON que se almacena en el directorio de datos de la extensión (Global Storage). Esto permite compartir tus plantillas de ignore entre todos tus proyectos sin crear archivos en cada uno de ellos.
+1. Abre el panel "Add Ignore" en la barra lateral
+2. Usa los botones **+** para añadir nuevas plantillas
+3. Haz clic derecho en una plantilla para editarla o eliminarla
 
-Para abrirlo, usa el comando: `Open AI Ignore Helper Configuration`.
+### 3. Configuración desde archivo JSON global
+
+Puedes editar directamente el archivo de configuración JSON que se almacena en el directorio de datos de la extensión (Global Storage). Para abrirlo, usa el comando: `Open AI Ignore Helper Configuration`.
 
 ---
 
@@ -98,46 +135,28 @@ Para abrirlo, usa el comando: `Open AI Ignore Helper Configuration`.
 
 ### Limpieza de Workspace (Zero Pollution)
 
-A partir de la versión 3.0.3 y perfeccionado en **3.0.4**, la extensión sigue una filosofía de **cero polución**:
+La extensión sigue una filosofía de **cero polución**:
 - **Sin carpeta `.vscode/` automática**: No se fuerza la creación de `settings.json` en el workspace.
 - **Sin carpeta `config/`**: El archivo `ignore-files-config.json` se almacena fuera del workspace del usuario.
-- **Configuración Global**: Las reglas y preferencias se mantienen a nivel de usuario, permitiendo que `git clone` funcione siempre en directorios limpios.
-
-### Sincronización Inteligente
-
-La extensión mantiene una sincronización bidireccional entre los VS Code Settings (User scope) y un archivo JSON de respaldo en el almacenamiento global. Esto garantiza que tus reglas estén siempre disponibles y sean fáciles de editar masivamente si lo deseas.
+- **Configuración Global**: Las reglas y preferencias se mantienen a nivel de usuario.
 
 ### Historial de Versiones
 
-**v3.0.4**
+**v4.0.0** (Actual)
+- **Panel "Add Ignore"**: Nuevo panel lateral con operaciones CRUD completas.
+- **Migración a TypeScript**: Código fuente completamente migrado con tipado estricto.
+- **TreeView**: Vista de árbol para gestionar plantillas visualmente.
+- **Nuevos comandos**: `addEntry`, `editEntry`, `deleteEntry`, `refreshView`.
 
-- **Zero Pollution Completo**: Eliminación total de dependencias de archivos locales para configuración.
-- **Limpieza**: Código refactorizado para usar exclusivamente almacenamiento global.
+**v3.0.4**
+- **Zero Pollution Completo**: Eliminación total de dependencias de archivos locales.
 
 **v3.0.3**
-
-- **Refactorización de Almacenamiento**: Eliminada la creación automática de carpetas `.vscode/` y `config/` en el workspace.
-- **Uso de GlobalStorageUri**: La configuración ahora se almacena en el directorio de datos global de VS Code.
-- **Zero Pollution**: La extensión ya no ensucia el workspace al iniciarse, permitiendo directorios de trabajo limpios.
-
-**v3.0.2**
-
-- Añadido archivo por defecto `Gemini Ignore` (`.geminiignore`) a la configuración.
-
-**v3.0.1**
-
-- Añadido archivo por defecto `Vercel Ignore` (`.vercelignore`) a la configuración y ejemplo del README
-
-**v2.0.8**
-
-- **Menú contextual**: Cambiado a "Add to Ignore Files and Rules".
-- **Nuevos comandos**: `AI Ignore: Add Rule` y `AI Ignore: Remove Rule` para gestionar reglas sin editar archivos.
-- **Sincronización automática**: Watcher de `config/ignore-files-config.json` que sincroniza JSON → Settings al guardar.
-- **Uso inmediato**: Al añadir o eliminar reglas, aparecen/desaparecen del menú sin reempaquetar ni recargar.
+- **Refactorización de Almacenamiento**: Uso de GlobalStorageUri.
 
 ### Tecnologías Utilizadas
 
-- **JavaScript**
+- **TypeScript** (v4.0+)
 - **Node.js**
 - **Visual Studio Code API**
 
@@ -153,15 +172,11 @@ La extensión mantiene una sincronización bidireccional entre los VS Code Setti
 
 ## 📸 Capturas
 
-Puedes incluir capturas en este README añadiendo imágenes a la carpeta `images/` y referenciándolas con rutas relativas, por ejemplo:
+Puedes incluir capturas en este README añadiendo imágenes a la carpeta `images/` y referenciándolas con rutas relativas:
 
 ```md
 ![Menú contextual](images/ejemplo-menu-contextual.png)
 ```
-
-Captura de la paleta de comandos con numeración de botones:
-
-![Paleta de comandos AI Ignore Helper](images/ai-ignore-helper-menu.png)
 
 ## 👤 Autor
 

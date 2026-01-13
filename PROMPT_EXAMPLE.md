@@ -5,7 +5,7 @@ La extension AI Ignore Helper permite seleccionar ficheros desde la pestaña del
 NECESITO HACER ESTA MEJORA:
 
 
-QUIERO QUE HAGAS UN DOCUMENTO CON ESTE FORMATO:
+QUIERO QUE HAGAS UN DOCUMENTO CON ESTE FORMATO DE EJEMPLO QUE DEBES DE SEGUIR:
 
 # Task: [Describe your task here]
 

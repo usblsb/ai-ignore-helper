@@ -1,13 +1,46 @@
-*.vsix
-.trae
-.vscode
-.cursorignore
-ayuda.md
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+out/
+dist/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
 .DS_Store
-add-rules
-reglas_llm
+Thumbs.db
+
+# Extension packages (keep in release folder only)
+*.vsix
+
+# Project-specific ignores
+.trae/
+.cursorignore
+.geminiignore
+ayuda.md
+add-rules/
+reglas_llm/
 PROMPT.md
 documentacion_del_proyecto/uso_de_ralph.md
-.agent/metrics/metrics_20260112_131717.json
-.geminiignore
-.gitignore
+.agent/metrics/
+
+# Release folder (packages are too large for git)
+release/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+PROMPT_EXAMPLE.md

@@ -3,10 +3,10 @@
 	"publisher": "usblsb",
 	"displayName": "AI Ignore Helper",
 	"description": "Una extensión configurable para Visual Studio Code que permite añadir archivos y carpetas a múltiples tipos de archivos ignore",
-    "version": "3.0.4",
+	"version": "4.0.2",
 	"icon": "images/icon.png",
 	"engines": {
-		"vscode": "^1.60.0"
+		"vscode": "^1.75.0"
 	},
 	"repository": {
 		"type": "git",
@@ -15,11 +15,33 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"*"
-	],
-	"main": "./extension.js",
+	"activationEvents": [],
+	"main": "./out/extension.js",
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile"
+	},
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "ai-ignore-panel",
+					"title": "Add Ignore",
+					"icon": "$(add)"
+				}
+			]
+		},
+		"views": {
+			"ai-ignore-panel": [
+				{
+					"id": "ai-ignore-view",
+					"name": "Ignore Templates",
+					"icon": "images/icon.png"
+				}
+			]
+		},
 		"configuration": {
 			"title": "AI Ignore Helper",
 			"properties": {
@@ -223,6 +245,26 @@
 			{
 				"command": "ai-ignore.syncToJSON",
 				"title": "AI Ignore: Sync from Settings to JSON"
+			},
+			{
+				"command": "ai-ignore.addEntry",
+				"title": "AI Ignore: Add Template",
+				"icon": "$(add)"
+			},
+			{
+				"command": "ai-ignore.editEntry",
+				"title": "AI Ignore: Edit Template",
+				"icon": "$(edit)"
+			},
+			{
+				"command": "ai-ignore.deleteEntry",
+				"title": "AI Ignore: Delete Template",
+				"icon": "$(trash)"
+			},
+			{
+				"command": "ai-ignore.refreshView",
+				"title": "AI Ignore: Refresh Templates",
+				"icon": "$(refresh)"
 			}
 		],
 		"menus": {
@@ -254,8 +296,59 @@
 				{
 					"command": "ai-ignore.openConfig",
 					"when": "true"
+				},
+				{
+					"command": "ai-ignore.addEntry",
+					"when": "true"
+				},
+				{
+					"command": "ai-ignore.editEntry",
+					"when": "true"
+				},
+				{
+					"command": "ai-ignore.deleteEntry",
+					"when": "true"
+				}
+			],
+			"view/title": [
+				{
+					"command": "ai-ignore.addEntry",
+					"when": "view == ai-ignore-view",
+					"group": "navigation"
+				},
+				{
+					"command": "ai-ignore.refreshView",
+					"when": "view == ai-ignore-view",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "ai-ignore.editEntry",
+					"when": "view == ai-ignore-view && viewItem == ignoreItem",
+					"group": "inline"
+				},
+				{
+					"command": "ai-ignore.deleteEntry",
+					"when": "view == ai-ignore-view && viewItem == ignoreItem",
+					"group": "inline"
+				},
+				{
+					"command": "ai-ignore.editEntry",
+					"when": "view == ai-ignore-view && viewItem == ignoreItem",
+					"group": "1_modify"
+				},
+				{
+					"command": "ai-ignore.deleteEntry",
+					"when": "view == ai-ignore-view && viewItem == ignoreItem",
+					"group": "2_delete"
 				}
 			]
 		}
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"@types/vscode": "^1.60.0",
+		"typescript": "^5.9.3"
 	}
 }
