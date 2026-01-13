@@ -11,6 +11,7 @@ Una extensión configurable para Visual Studio Code que permite añadir archivos
 
 - ✨ Características Principales
 - 🆕 Panel "Add Ignore" (NUEVO en v4.0)
+- 🔍 Verificación de .gitignore (NUEVO en v4.1)
 - 🚀 Instalación
 - 💻 Uso
 - ⚙️ Configuración
@@ -54,6 +55,41 @@ La versión 4.0 introduce un **panel lateral dedicado** para gestionar las plant
 - **Iconos contextuales**: Botones de edición y eliminación directamente en cada elemento.
 - **Persistencia global**: Los cambios se guardan en la configuración global de VS Code.
 - **Sincronización automática**: Los cambios se reflejan inmediatamente en el menú contextual.
+
+---
+
+## 🔍 Verificación de .gitignore (NUEVO en v4.1)
+
+La versión 4.1 introduce una funcionalidad para **detectar y corregir incoherencias** entre tu archivo `.gitignore` y los archivos rastreados por Git.
+
+### ¿Qué problema resuelve?
+
+Cuando añades un archivo a `.gitignore` **después** de haberlo subido a Git, el archivo **sigue siendo rastreado**. Esto puede causar que archivos sensibles o innecesarios permanezcan en tu repositorio aunque estén en `.gitignore`.
+
+### Cómo usar
+
+#### Opción 1: Desde el panel lateral
+1. Abre el panel **Add Ignore** en la barra de actividad.
+2. Haz clic en el botón **⚠️** (icono de advertencia) en la barra de título del panel.
+
+#### Opción 2: Desde la paleta de comandos
+1. Pulsa `Cmd+Shift+P` (Mac) o `Ctrl+Shift+P` (Windows/Linux).
+2. Busca **"AI Ignore: Check Gitignore Sync"**.
+
+### Opciones disponibles
+
+| Opción | Descripción |
+|--------|-------------|
+| 🔧 **Corregir todo automáticamente** | Ejecuta `git rm --cached` para cada archivo problemático. Los archivos locales **NO** se eliminan. |
+| 📋 **Copiar comandos al portapapeles** | Copia los comandos para ejecutarlos manualmente. |
+| 📄 **Ver archivos problemáticos** | Lista los archivos que están en `.gitignore` pero siguen siendo rastreados. |
+
+### Flujo recomendado
+
+1. Ejecuta la verificación periódicamente o antes de hacer push.
+2. Si se detectan problemas, usa "Corregir todo automáticamente".
+3. Haz commit de los cambios.
+4. Ejecuta `git push` para sincronizar con el repositorio remoto.
 
 ---
 
@@ -108,6 +144,7 @@ La versión 4.0 introduce un **panel lateral dedicado** para gestionar las plant
 | `Open AI Ignore Helper Configuration` | Abre el archivo de configuración global |
 | `AI Ignore: Sync from JSON to Settings` | Sincroniza desde JSON a VS Code Settings |
 | `AI Ignore: Sync from Settings to JSON` | Sincroniza desde VS Code Settings a JSON |
+| `AI Ignore: Check Gitignore Sync` | Detecta archivos en `.gitignore` que siguen siendo rastreados |
 
 ## ⚙️ Configuración
 
@@ -142,7 +179,12 @@ La extensión sigue una filosofía de **cero polución**:
 
 ### Historial de Versiones
 
-**v4.0.0** (Actual)
+**v4.1.0** (Actual)
+- **Verificación de .gitignore**: Detecta archivos ignorados que siguen siendo rastreados por Git.
+- **Corrección automática**: Ejecuta `git rm --cached` con un clic.
+- **Nuevo comando**: `checkGitignoreSync` disponible desde el panel y la paleta de comandos.
+
+**v4.0.0**
 - **Panel "Add Ignore"**: Nuevo panel lateral con operaciones CRUD completas.
 - **Migración a TypeScript**: Código fuente completamente migrado con tipado estricto.
 - **TreeView**: Vista de árbol para gestionar plantillas visualmente.
